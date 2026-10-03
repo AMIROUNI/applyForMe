@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="240" height="60" aria-label="ApplyForME">
+  <defs>
+    <linearGradient id="brandA" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF4D57"/>
+      <stop offset="100%" stop-color="#F0404B"/>
+    </linearGradient>
+    <linearGradient id="brandME" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF4D57"/>
+      <stop offset="100%" stop-color="#F0404B"/>
+    </linearGradient>
+  </defs>
+  <g transform="translate(10, 10)">
+    <path fill="url(#brandA)" d="M30 5 C15 5 5 15 5 30 C5 45 15 55 30 55 C45 55 55 45 55 30 C55 15 45 5 30 5 Z"/>
+    <path fill="white" d="M30 12.5 C21 12.5 15 18.5 15 27.5 C15 36.5 21 42.5 30 42.5 C39 42.5 45 36.5 45 27.5 C45 18.5 39 12.5 30 12.5 Z"/>
+    <path fill="url(#brandA)" d="M30 20 L22.5 27.5 L27.5 27.5 L27.5 37.5 L32.5 37.5 L32.5 27.5 L37.5 27.5 L30 20 Z"/>
+    <path fill="white" d="M26 27.5 L29 30.5 L34 25.5"/>
+  </g>
+  <text x="70" y="42" font-family="Poppins, system-ui, sans-serif" font-weight="700" font-size="28" fill="#F5ECEC" letter-spacing="-0.5px">ApplyFor</text>
+  <text x="192" y="42" font-family="Poppins, system-ui, sans-serif" font-weight="700" font-size="28" fill="#FF4D57">ME</text>
+</svg>

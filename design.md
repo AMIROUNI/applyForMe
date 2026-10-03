@@ -68,6 +68,9 @@ Rules:
 | `--color-info` | `#0369A1` | In progress, medium match |
 | `--color-info-soft` | `#E0F2FE` | |
 | `--color-focus-ring` | `rgba(214,16,28,.35)` | 3px focus ring |
+| `--color-scrim` | `rgba(26,10,12,.72)` | Video overlay scrim (dark warm black) |
+| `--color-scrim-strong` | `rgba(26,10,12,.85)` | Stronger scrim for text contrast |
+| `--color-scrim-soft` | `rgba(26,10,12,.45)` | Softer scrim for subtle overlay |
 
 ### 2.3 Dark theme (`@media (prefers-color-scheme: dark)` and `[data-theme="dark"]`)
 
@@ -93,6 +96,9 @@ Rules:
 | `--color-info` | `#38BDF8` | |
 | `--color-info-soft` | `#0C2A3D` | |
 | `--color-focus-ring` | `rgba(255,77,87,.45)` | |
+| `--color-scrim` | `rgba(15,10,11,.75)` | Video overlay scrim (dark warm black) |
+| `--color-scrim-strong` | `rgba(15,10,11,.88)` | Stronger scrim for text contrast |
+| `--color-scrim-soft` | `rgba(15,10,11,.5)` | Softer scrim for subtle overlay |
 
 Why two primary tokens: a saturated red works as a button background in both modes but is too dark for text/icons on a dark background, so text/icons use `--color-primary` and buttons use `--color-primary-fill`.
 

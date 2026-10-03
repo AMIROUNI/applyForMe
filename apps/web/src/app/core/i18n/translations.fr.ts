@@ -9,12 +9,7 @@ export const frTranslations: Record<string, string> = {
   'hero.title': 'Votre prochain poste, candidaté pour vous.',
   'hero.subtitle': 'Déposez votre CV, définissez vos préférences, et laissez nos agents IA trouver, matcher et postuler aux meilleures offres — automatiquement.',
   'hero.ctaPrimary': 'Commencer gratuitement',
-  'hero.ctaSecondary': 'Voir comment ça marche',
-  'hero.jobCard.new': 'Nouveau',
-  'hero.jobCard.manual': 'Candidature manuelle',
-  'hero.jobCard.bestMatch': 'Meilleur match',
-  'hero.jobCard.openSite': 'Ouvrir le site',
-  'hero.jobCard.apply': 'Postuler →',
+  'hero.trustText': 'Sans carte bancaire · Annulable à tout moment',
 
   // How it works
   'howItWorks.title': 'Comment ça marche',

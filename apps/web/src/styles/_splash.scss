@@ -1,0 +1,70 @@
+.app-splash {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100svh;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  transition: opacity 200ms var(--transition-ease), visibility 200ms var(--transition-ease);
+}
+
+.app-splash--hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.app-splash__logo {
+  width: 96px;
+  height: 96px;
+  margin-bottom: var(--spacing-5);
+}
+
+.app-splash__progress {
+  width: 200px;
+  max-width: 80vw;
+  height: 4px;
+  background: var(--color-surface-alt);
+  border-radius: var(--radius-badge);
+  overflow: hidden;
+  margin-bottom: var(--spacing-4);
+}
+
+.app-splash__progress-bar {
+  width: 0%;
+  height: 100%;
+  background: var(--gradient-brand);
+  border-radius: inherit;
+  animation: app-splash-progress 2s ease-in-out infinite;
+  transform-origin: left center;
+}
+
+@keyframes app-splash-progress {
+  0% { width: 0%; transform: translateX(0); }
+  50% { width: 70%; transform: translateX(0); }
+  100% { width: 100%; transform: translateX(100%); }
+}
+
+.app-splash__text {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-splash__progress-bar {
+    animation: none;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-splash__logo {
+    width: 80px;
+    height: 80px;
+  }
+}

@@ -2,12 +2,36 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Web</title>
+  <title>ApplyForME — Your next job, applied for you.</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="ApplyForME finds, matches, and applies to jobs for you. Upload your CV, set preferences, and let AI agents do the work.">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="preload" as="image" href="/media/hero-poster.webp">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="/assets/fonts/inter-latin-400.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="/assets/fonts/poppins-latin-600.woff2">
 </head>
 <body>
-  <app-root></app-root>
+  <app-root>
+    <div class="app-splash" aria-hidden="true" role="status">
+      <svg class="app-splash__logo" viewBox="0 0 120 120" aria-hidden="true">
+        <defs>
+          <linearGradient id="splashA" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--brand-logo, #F01420)"/>
+            <stop offset="100%" stop-color="var(--brand-600, #B30D17)"/>
+          </linearGradient>
+        </defs>
+        <path fill="url(#splashA)" d="M60 10 C30 10 10 30 10 60 C10 90 30 110 60 110 C90 110 110 90 110 60 C110 30 90 10 60 10 Z"/>
+        <path fill="var(--color-on-primary, #FFFFFF)" d="M60 25 C40 25 25 40 25 60 C25 80 40 95 60 95 C80 95 95 80 95 60 C95 40 80 25 60 25 Z"/>
+        <path fill="url(#splashA)" d="M60 40 L45 55 L55 55 L55 75 L65 75 L65 55 L75 55 L60 40 Z"/>
+        <path fill="var(--color-on-primary, #FFFFFF)" d="M52 55 L58 61 L68 51"/>
+      </svg>
+      <div class="app-splash__progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="Checking your session">
+        <div class="app-splash__progress-bar"></div>
+      </div>
+      <p class="app-splash__text">Checking your session…</p>
+    </div>
+  </app-root>
 </body>
 </html>
