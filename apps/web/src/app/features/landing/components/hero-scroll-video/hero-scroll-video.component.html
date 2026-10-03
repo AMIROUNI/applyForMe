@@ -1,0 +1,67 @@
+<section class="hero-scroll-video" #sectionEl>
+  <div class="hero-scroll-video__sticky">
+    @if (showVideo()) {
+      <video
+        #videoEl
+        class="hero-scroll-video__video"
+        [src]="videoSrc()"
+        [poster]="posterSrc"
+        playsinline
+        muted
+        (loadedmetadata)="onVideoLoaded()"
+        (error)="onVideoError()"
+        aria-hidden="true"
+      ></video>
+    } @else {
+      <img
+        class="hero-scroll-video__poster"
+        [src]="posterSrc"
+        alt=""
+        aria-hidden="true"
+        width="1280"
+        height="720"
+        loading="eager"
+        decoding="async"
+      >
+    }
+
+    <div class="hero-scroll-video__scrim" [style]="getScrimStyle()"></div>
+
+    <div
+      class="hero-scroll-video__content"
+      [style.opacity]="getTextOpacity()"
+      [style.transform]="getTextTransform()"
+    >
+      <h1 class="hero-scroll-video__title">{{ t()['hero.title'] }}</h1>
+      <p class="hero-scroll-video__subtitle">{{ t()['hero.subtitle'] }}</p>
+
+      <div class="hero-scroll-video__cta">
+        <app-button
+          variant="primary"
+          [gradient]="true"
+          size="default"
+          (clicked)="onCtaClick()"
+        >
+          {{ t()['hero.ctaPrimary'] }}
+          <svg
+            class="hero-scroll-video__arrow"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </app-button>
+      </div>
+
+      <p class="hero-scroll-video__trust">{{ t()['hero.trustText'] }}</p>
+    </div>
+  </div>
+</section>

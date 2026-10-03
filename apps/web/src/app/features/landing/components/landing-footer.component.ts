@@ -13,7 +13,15 @@ import { ThemeService } from '../../../core/layout/theme.service';
         <div class="landing-footer__grid">
           <div class="landing-footer__brand">
             <a href="/" class="landing-footer__logo" aria-label="ApplyForME home">
-              <img src="/assets/brand/logo.png" alt="" class="landing-footer__logo-img" [class.landing-footer__logo-img--dark]="isDark()">
+              <img
+                [src]="logoSrc()"
+                alt=""
+                class="landing-footer__logo-img"
+                width="180"
+                height="45"
+                loading="lazy"
+                decoding="async"
+              >
             </a>
             <p class="landing-footer__tagline">{{ t()['footer.madeWith'] }}</p>
           </div>
@@ -93,13 +101,6 @@ import { ThemeService } from '../../../core/layout/theme.service';
     .landing-footer__logo-img {
       height: 36px;
       width: auto;
-      border-radius: 4px;
-    }
-
-    .landing-footer__logo-img--dark {
-      background: var(--color-surface);
-      padding: 4px 8px;
-      border-radius: 12px;
     }
 
     .landing-footer__tagline {
@@ -157,4 +158,10 @@ export class LandingFooterComponent {
 
   t = computed(() => this.i18n.t());
   isDark = computed(() => this.themeService.effectiveTheme() === 'dark');
+
+  logoSrc = computed(() => {
+    return this.isDark() 
+      ? '/assets/brand/logo-full-dark.svg' 
+      : '/assets/brand/logo-full.svg';
+  });
 }

@@ -1,0 +1,113 @@
+.hero-scroll-video {
+  height: 250vh;
+  position: relative;
+  width: 100%;
+}
+
+.hero-scroll-video__sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-scroll-video__video,
+.hero-scroll-video__poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: 16 / 9;
+  z-index: 0;
+}
+
+.hero-scroll-video__poster {
+  will-change: opacity;
+  transition: opacity 300ms var(--transition-ease);
+}
+
+.hero-scroll-video__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.hero-scroll-video__content {
+  position: relative;
+  z-index: 2;
+  max-width: 720px;
+  padding: var(--spacing-6) var(--spacing-4);
+  text-align: left;
+  color: var(--color-on-primary);
+  transition: opacity 300ms var(--transition-ease), transform 300ms var(--transition-ease);
+  will-change: opacity, transform;
+  padding-top: calc(var(--spacing-6) + 64px);
+}
+
+.hero-scroll-video__title {
+  font-family: var(--font-heading);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--text-3xl);
+  line-height: var(--leading-tight);
+  margin: 0 0 var(--spacing-4);
+  color: var(--color-on-primary);
+}
+
+.hero-scroll-video__subtitle {
+  font-size: var(--text-lg);
+  line-height: var(--leading-relaxed);
+  margin: 0 0 var(--spacing-6);
+  color: color-mix(in srgb, var(--color-on-primary) 85%, transparent);
+  max-width: 560px;
+}
+
+.hero-scroll-video__cta {
+  margin-bottom: var(--spacing-5);
+}
+
+.hero-scroll-video__arrow {
+  flex-shrink: 0;
+  transition: transform var(--transition-duration) var(--transition-ease);
+}
+
+app-button[variant="primary"]:hover .hero-scroll-video__arrow {
+  transform: translateX(4px);
+}
+
+.hero-scroll-video__trust {
+  font-size: var(--text-sm);
+  color: color-mix(in srgb, var(--color-on-primary) 70%, transparent);
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .hero-scroll-video__title {
+    font-size: var(--text-2xl);
+  }
+
+  .hero-scroll-video__subtitle {
+    font-size: var(--text-base);
+  }
+
+  .hero-scroll-video__content {
+    padding-top: calc(var(--spacing-4) + 56px);
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-scroll-video__title {
+    font-size: var(--text-xl);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-scroll-video__content {
+    transition: none;
+  }
+}

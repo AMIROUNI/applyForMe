@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LandingHeaderComponent } from './components/landing-header.component';
-import { LandingHeroComponent } from './components/landing-hero.component';
+import { HeroScrollVideoComponent } from './components/hero-scroll-video/hero-scroll-video.component';
 import { LandingHowItWorksComponent } from './components/landing-how-it-works.component';
 import { LandingFeaturesComponent } from './components/landing-features.component';
 import { LandingCtaComponent } from './components/landing-cta.component';
@@ -13,7 +13,7 @@ import { LandingFooterComponent } from './components/landing-footer.component';
   imports: [
     CommonModule,
     LandingHeaderComponent,
-    LandingHeroComponent,
+    HeroScrollVideoComponent,
     LandingHowItWorksComponent,
     LandingFeaturesComponent,
     LandingCtaComponent,
@@ -23,7 +23,7 @@ import { LandingFooterComponent } from './components/landing-footer.component';
     <div class="landing-page">
       <app-landing-header></app-landing-header>
       <main class="landing-page__main">
-        <app-landing-hero></app-landing-hero>
+        <app-hero-scroll-video></app-hero-scroll-video>
         <app-landing-how-it-works></app-landing-how-it-works>
         <app-landing-features></app-landing-features>
         <app-landing-cta></app-landing-cta>

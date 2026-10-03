@@ -9,12 +9,7 @@ export const enTranslations: Record<string, string> = {
   'hero.title': 'Your next job, applied for you.',
   'hero.subtitle': 'Upload your CV, set your preferences, and let our AI agents find, match, and apply to the best jobs — automatically.',
   'hero.ctaPrimary': 'Get started free',
-  'hero.ctaSecondary': 'See how it works',
-  'hero.jobCard.new': 'New',
-  'hero.jobCard.manual': 'Manual apply',
-  'hero.jobCard.bestMatch': 'Best match',
-  'hero.jobCard.openSite': 'Open site',
-  'hero.jobCard.apply': 'Apply →',
+  'hero.trustText': 'No credit card required · Cancel anytime',
 
   // How it works
   'howItWorks.title': 'How it works',

@@ -15,10 +15,13 @@ import { ButtonComponent } from '../../../shared/ui/button/button.component';
       <div class="landing-header__container">
         <a href="/" class="landing-header__logo" aria-label="ApplyForME home">
           <img
-            src="/assets/brand/logo.png"
+            [src]="logoSrc()"
             alt=""
             class="landing-header__logo-img"
-            [class.landing-header__logo-img--dark]="isDark()"
+            width="180"
+            height="45"
+            loading="eager"
+            decoding="async"
           >
         </a>
 
@@ -62,13 +65,6 @@ import { ButtonComponent } from '../../../shared/ui/button/button.component';
     .landing-header__logo-img {
       height: 36px;
       width: auto;
-      border-radius: 4px;
-    }
-
-    .landing-header__logo-img--dark {
-      background: var(--color-surface);
-      padding: 4px 8px;
-      border-radius: 12px;
     }
 
     .landing-header__nav {
@@ -106,6 +102,12 @@ export class LandingHeaderComponent {
 
   t = computed(() => this.i18n.t());
   isDark = computed(() => this.themeService.effectiveTheme() === 'dark');
+
+  logoSrc = computed(() => {
+    return this.isDark() 
+      ? '/assets/brand/logo-full-dark.svg' 
+      : '/assets/brand/logo-full.svg';
+  });
 
   onLogInClick(): void {
     console.log('Log in clicked');

@@ -34,15 +34,16 @@
             ],
             "styles": [
               "src/styles.scss"
-            ]
+            ],
+            "optimization": true
           },
           "configurations": {
             "production": {
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "250kB",
+                  "maximumError": "400kB"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -50,7 +51,14 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "namedChunks": false,
+              "extractLicenses": true,
+              "optimization": {
+                "scripts": true,
+                "styles": true,
+                "fonts": true
+              }
             },
             "development": {
               "optimization": false,
