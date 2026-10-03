@@ -1,0 +1,179 @@
+@use 'sass:color';
+
+@use 'typography' as *;
+
+:root,
+[data-theme="light"] {
+  --brand-50: #FEF2F2;
+  --brand-100: #FDE3E4;
+  --brand-300: #F7898F;
+  --brand-500: #D6101C;
+  --brand-600: #B30D17;
+  --brand-700: #8F0A12;
+  --brand-900: #7A0610;
+  --brand-logo: #F01420;
+
+  --color-bg: #FAF7F7;
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #F5EEEE;
+  --color-border: #E8DCDC;
+  --color-text: #1A0A0C;
+  --color-text-muted: #5C4A4C;
+  --color-primary: #D6101C;
+  --color-primary-fill: #D6101C;
+  --color-primary-hover: #B30D17;
+  --color-primary-soft: #FEF2F2;
+  --color-on-primary: #FFFFFF;
+  --color-success: #15803D;
+  --color-success-soft: #DCFCE7;
+  --color-warning: #B45309;
+  --color-warning-soft: #FEF3C7;
+  --color-danger: #9F1239;
+  --color-danger-soft: #FFE4E6;
+  --color-info: #0369A1;
+  --color-info-soft: #E0F2FE;
+  --color-focus-ring: rgba(214, 16, 28, 0.35);
+
+  --gradient-brand: linear-gradient(135deg, #D6101C 0%, #A50B15 100%);
+
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 24px;
+  --spacing-6: 32px;
+  --spacing-7: 48px;
+  --spacing-8: 64px;
+
+  --radius-input: 10px;
+  --radius-card: 14px;
+  --radius-badge: 999px;
+  --radius-dialog: 16px;
+
+  --elevation-light: 0 1px 2px rgba(26, 10, 12, 0.06), 0 6px 16px rgba(26, 10, 12, 0.06);
+  --transition-duration: 150ms;
+  --transition-ease: ease-out;
+
+  --max-content-width: 1200px;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #0F0A0B;
+    --color-surface: #181112;
+    --color-surface-alt: #231A1B;
+    --color-border: #3A2C2E;
+    --color-text: #F5ECEC;
+    --color-text-muted: #B5A3A5;
+    --color-primary: #FF4D57;
+    --color-primary-fill: #E11D2B;
+    --color-primary-hover: #F0404B;
+    --color-primary-soft: #2A1114;
+    --color-on-primary: #FFFFFF;
+    --color-success: #4ADE80;
+    --color-success-soft: #12301F;
+    --color-warning: #FBBF24;
+    --color-warning-soft: #3A2A0A;
+    --color-danger: #FB7185;
+    --color-danger-soft: #3F1220;
+    --color-info: #38BDF8;
+    --color-info-soft: #0C2A3D;
+    --color-focus-ring: rgba(255, 77, 87, 0.45);
+
+    --gradient-brand: linear-gradient(135deg, #E11D2B 0%, #B30D17 100%);
+
+    --elevation-light: none;
+
+    color-scheme: dark;
+  }
+}
+
+[data-theme="dark"] {
+  --color-bg: #0F0A0B;
+  --color-surface: #181112;
+  --color-surface-alt: #231A1B;
+  --color-border: #3A2C2E;
+  --color-text: #F5ECEC;
+  --color-text-muted: #B5A3A5;
+  --color-primary: #FF4D57;
+  --color-primary-fill: #E11D2B;
+  --color-primary-hover: #F0404B;
+  --color-primary-soft: #2A1114;
+  --color-on-primary: #FFFFFF;
+  --color-success: #4ADE80;
+  --color-success-soft: #12301F;
+  --color-warning: #FBBF24;
+  --color-warning-soft: #3A2A0A;
+  --color-danger: #FB7185;
+  --color-danger-soft: #3F1220;
+  --color-info: #38BDF8;
+  --color-info-soft: #0C2A3D;
+  --color-focus-ring: rgba(255, 77, 87, 0.45);
+
+  --gradient-brand: linear-gradient(135deg, #E11D2B 0%, #B30D17 100%);
+
+  --elevation-light: none;
+
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.5;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  transition: background-color var(--transition-duration) var(--transition-ease), color var(--transition-duration) var(--transition-ease);
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+::selection {
+  background-color: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-duration) var(--transition-ease);
+}
+
+a:hover {
+  color: var(--color-primary-hover);
+}
