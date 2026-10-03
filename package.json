@@ -1,0 +1,25 @@
+{
+  "name": "agency-apply",
+  "version": "0.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w apps/web",
+    "build": "npm run build -w apps/web",
+    "build:prod": "npm run build:prod -w apps/web",
+    "lint": "npm run lint -w apps/web",
+    "test": "npm run test -w apps/web",
+    "e2e": "npm run e2e -w apps/web"
+  },
+  "devDependencies": {
+    "@angular/cli": "^20.0.0",
+    "@angular/compiler-cli": "^20.0.0",
+    "typescript": "^5.8.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
