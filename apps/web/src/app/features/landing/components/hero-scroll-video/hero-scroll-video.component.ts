@@ -111,7 +111,6 @@ export class HeroScrollVideoComponent implements AfterViewInit, OnDestroy {
         for (const entry of entries) {
           if (entry.isIntersecting && !this.videoLoaded) {
             this.loadVideo();
-            this.videoLoaded = true;
             this.heroObserver?.unobserve(this.sectionEl!.nativeElement);
           }
         }
@@ -130,18 +129,19 @@ export class HeroScrollVideoComponent implements AfterViewInit, OnDestroy {
   }
 
   private maybeLoadVideoEarly(): void {
-    if (document.readyState === 'complete' && this.sectionEl?.nativeElement) {
+    if (document.readyState === 'complete' && this.sectionEl?.nativeElement && !this.videoLoaded) {
       const rect = this.sectionEl.nativeElement.getBoundingClientRect();
-      if (rect.top < window.innerHeight + 200 && !this.videoLoaded) {
+      if (rect.top < window.innerHeight + 200) {
         this.loadVideo();
-        this.videoLoaded = true;
       }
     }
   }
 
   private loadVideo(): void {
     const video = this.videoEl?.nativeElement;
-    if (!video || this.mode() === 'static') return;
+    if (!video || this.mode() === 'static' || this.videoLoaded) return;
+
+    this.videoLoaded = true;
 
     const src = this.mode() === 'loop' ? '/media/hero-loop.mp4' : '/media/hero-scrub.mp4';
     this.videoSrc.set(src);
@@ -154,6 +154,7 @@ export class HeroScrollVideoComponent implements AfterViewInit, OnDestroy {
     video.addEventListener('loadedmetadata', () => {
       this.videoDuration.set(video.duration);
       this.ready.set(true);
+      this.computeSectionMetrics();
     });
 
     video.addEventListener('canplay', () => {
@@ -165,6 +166,7 @@ export class HeroScrollVideoComponent implements AfterViewInit, OnDestroy {
     video.addEventListener('error', () => {
       this.mode.set('static');
       this.showVideo.set(false);
+      this.videoLoaded = false;
     });
 
     if (this.mode() === 'scrub') {
