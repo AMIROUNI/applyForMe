@@ -57,5 +57,38 @@ export const frTranslations: Record<string, string> = {
   'footer.terms': 'Conditions',
   'footer.cookies': 'Cookies',
   'footer.copyright': '© 2025 ApplyForME. Tous droits réservés.',
-  'footer.madeWith': 'Fait avec vitesse, progrès, confiance.'
+  'footer.madeWith': 'Fait avec vitesse, progrès, confiance.',
+
+  // Header auth
+  'header.logOut': 'Se déconnecter',
+
+  // Auth pages
+  'auth.login.title': 'Bon retour',
+  'auth.login.subtitle': 'Connectez-vous pour continuer sur ApplyForME.',
+  'auth.register.title': 'Créez votre compte',
+  'auth.register.subtitle': 'Commencez à postuler en quelques minutes.',
+  'auth.email': 'E-mail',
+  'auth.password': 'Mot de passe',
+  'auth.confirmPassword': 'Confirmer le mot de passe',
+  'auth.submitLogin': 'Se connecter',
+  'auth.submitRegister': 'Créer un compte',
+  'auth.google': 'Continuer avec Google',
+  'auth.or': 'ou',
+  'auth.noAccount': 'Pas encore de compte ?',
+  'auth.createAccount': 'Créez-en un',
+  'auth.haveAccount': 'Vous avez déjà un compte ?',
+  'auth.logInInstead': 'Connexion',
+  'auth.callback.title': 'Connexion en cours…',
+  'auth.error.invalidEmail': 'Saisissez une adresse e-mail valide',
+  'auth.error.required': 'Ce champ est requis',
+  'auth.error.passwordTooShort': 'Le mot de passe doit contenir au moins 10 caractères',
+  'auth.error.passwordMismatch': 'Les mots de passe ne correspondent pas',
+  'auth.error.invalidCredentials': 'E-mail ou mot de passe invalide',
+  'auth.error.emailTaken': 'Un compte existe déjà avec cet e-mail',
+  'auth.error.rateLimited': 'Trop de tentatives. Patientez une minute puis réessayez.',
+  'auth.error.invalidState': 'Votre session de connexion a expiré. Réessayez.',
+  'auth.error.oauthFailed': 'La connexion avec Google a échoué. Réessayez.',
+  'auth.error.accessDenied': 'La connexion avec Google a été annulée.',
+  'auth.error.emailNotVerified': "Ce compte Google n'a pas d'adresse e-mail vérifiée. Vérifiez-la avec Google, puis réessayez.",
+  'auth.error.generic': 'Une erreur est survenue. Réessayez.'
 };
