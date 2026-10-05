@@ -21,10 +21,25 @@ export class HttpExceptionFilter implements ExceptionFilter {
       if (typeof res === 'object' && res !== null) {
         const r = res as Record<string, unknown>;
         code = (r.code as string) ?? code;
-        message = (r.message as string) ?? exception.message;
+        if (typeof r.message === 'string') {
+          message = r.message;
+        } else if (Array.isArray(r.message)) {
+          message = (r.message as unknown[]).map((m) => String(m)).join(', ');
+        } else {
+          message = exception.message;
+        }
         details = r.details;
       } else {
         message = exception.message;
+      }
+      if (status === HttpStatus.BAD_REQUEST && code === 'INTERNAL_SERVER_ERROR') {
+        code = 'VALIDATION_ERROR';
+      }
+      if (status === HttpStatus.TOO_MANY_REQUESTS && code === 'INTERNAL_SERVER_ERROR') {
+        code = 'RATE_LIMITED';
+      }
+      if (status === HttpStatus.UNAUTHORIZED && code === 'INTERNAL_SERVER_ERROR') {
+        code = 'UNAUTHORIZED';
       }
     } else if (exception instanceof Error) {
       message = exception.message;
