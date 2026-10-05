@@ -6,6 +6,7 @@ import { enTranslations } from './core/i18n/translations.en';
 import { frTranslations } from './core/i18n/translations.fr';
 import { routes } from './app.routes';
 import { devDelayInterceptor } from './core/http/dev-delay.interceptor';
+import { authInterceptor } from './core/auth/auth.interceptor';
 
 function initializeI18n(i18n: I18nService): () => void {
   return () => {
@@ -19,7 +20,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([devDelayInterceptor])),
+    provideHttpClient(withInterceptors([devDelayInterceptor, authInterceptor])),
     {
       provide: APP_INITIALIZER,
       useFactory: initializeI18n,

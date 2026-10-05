@@ -15,7 +15,7 @@ export const devDelayInterceptor: HttpInterceptorFn = (
     return next(req);
   }
 
-  if (req.url.includes('/api/v1/me')) {
+  if (req.url.includes('/api/v1/me') || req.url.includes('/api/v1/auth/me')) {
     return timer(3000).pipe(
       delay(0),
       switchMap(() => next(req))
