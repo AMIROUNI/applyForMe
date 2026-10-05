@@ -8,7 +8,8 @@ export class User {
   @Prop({ required: true, unique: true, lowercase: true, trim: true })
   email: string;
 
-  @Prop({ required: true, select: false })
+  // Empty for Google-only accounts (they sign in via OAuth, never a password).
+  @Prop({ default: '' })
   passwordHash: string;
 
   @Prop({ default: null })
@@ -25,5 +26,3 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
-
-UserSchema.index({ email: 1 }, { unique: true });

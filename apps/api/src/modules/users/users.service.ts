@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './user.schema';
@@ -11,7 +11,7 @@ export class UsersService {
   async create(email: string, passwordHash: string): Promise<UserDocument> {
     const existing = await this.userModel.findOne({ email }).exec();
     if (existing) {
-      throw new ConflictException('Email already registered');
+      throw new ConflictException({ code: 'EMAIL_TAKEN', message: 'Email already registered' });
     }
     const user = new this.userModel({ email, passwordHash });
     return user.save();
@@ -40,6 +40,9 @@ export class UsersService {
   }
 
   async validatePassword(user: UserDocument, password: string): Promise<boolean> {
+    if (!user.passwordHash) {
+      return false;
+    }
     return argon2.verify(user.passwordHash, password);
   }
 
