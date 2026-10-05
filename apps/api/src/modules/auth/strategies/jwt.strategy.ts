@@ -2,33 +2,40 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
+import { Request } from 'express';
 import { UsersService } from '../../users/users.service';
+import { JwtPayload } from '../token.service';
+
+export interface AuthenticatedUser {
+  id: string;
+  email: string;
+  sessionId: string;
+}
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     config: ConfigService,
-    private users: UsersService,
+    private readonly users: UsersService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (req) => req?.cookies?.af_at,
+        (req: Request) => req?.cookies?.['af_at'],
         ExtractJwt.fromAuthHeaderAsBearerToken(),
       ]),
       ignoreExpiration: false,
-      secretOrKey: config.get<string>('JWT_ACCESS_SECRET'),
+      secretOrKey: config.get<string>('JWT_ACCESS_SECRET') ?? '',
       issuer: 'agency-apply',
       audience: 'agency-apply-web',
       passReqToCallback: true,
     });
   }
 
-  async validate(req: any, payload: { sub: string; sid: string }) {
+  async validate(req: Request, payload: JwtPayload): Promise<AuthenticatedUser> {
     const user = await this.users.findById(payload.sub);
     if (!user) {
-      throw new UnauthorizedException('User not found');
+      throw new UnauthorizedException({ code: 'USER_NOT_FOUND', message: 'User not found' });
     }
-    req.user = { id: payload.sub, email: user.email, sessionId: payload.sid };
-    return req.user;
+    return { id: payload.sub, email: user.email, sessionId: payload.sid };
   }
 }
