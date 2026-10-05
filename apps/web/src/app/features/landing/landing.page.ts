@@ -43,4 +43,17 @@ import { LandingFooterComponent } from './components/landing-footer.component';
     }
   `]
 })
-export class LandingPageComponent {}
+export class LandingPageComponent {
+  constructor() {
+    // Preload the hero poster only on the page that actually uses it,
+    // so auth pages don't warn about an unused preloaded resource.
+    if (typeof document !== 'undefined' && !document.querySelector('link[data-hero-poster]')) {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = '/media/hero-poster.webp';
+      link.setAttribute('data-hero-poster', '');
+      document.head.appendChild(link);
+    }
+  }
+}

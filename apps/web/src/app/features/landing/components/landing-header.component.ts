@@ -1,9 +1,11 @@
 import { Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { ThemeToggleComponent } from '../../../core/layout/theme-toggle.component';
 import { LanguageToggleComponent } from '../../../core/i18n/language-toggle.component';
 import { I18nService } from '../../../core/i18n/i18n.service';
 import { ThemeService } from '../../../core/layout/theme.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
 
 @Component({
@@ -29,8 +31,15 @@ import { ButtonComponent } from '../../../shared/ui/button/button.component';
           <app-theme-toggle></app-theme-toggle>
           <app-language-toggle></app-language-toggle>
           <div class="landing-header__actions">
-            <app-button variant="ghost" (clicked)="onLogInClick()">{{ t()['header.logIn'] }}</app-button>
-            <app-button variant="primary" [gradient]="true" (clicked)="onGetStartedClick()">{{ t()['header.getStarted'] }}</app-button>
+            @if (auth.loggedIn()) {
+              <span class="landing-header__user" [title]="auth.user()?.email ?? ''">
+                {{ auth.user()?.email }}
+              </span>
+              <app-button variant="ghost" (clicked)="onLogOutClick()">{{ t()['header.logOut'] }}</app-button>
+            } @else {
+              <app-button variant="ghost" (clicked)="onLogInClick()">{{ t()['header.logIn'] }}</app-button>
+              <app-button variant="primary" [gradient]="true" (clicked)="onGetStartedClick()">{{ t()['header.getStarted'] }}</app-button>
+            }
           </div>
         </nav>
       </div>
@@ -79,6 +88,16 @@ import { ButtonComponent } from '../../../shared/ui/button/button.component';
       gap: var(--spacing-2);
     }
 
+    .landing-header__user {
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      padding: 0 var(--spacing-2);
+    }
+
     @media (max-width: 768px) {
       .landing-header__nav {
         gap: var(--spacing-2);
@@ -99,21 +118,30 @@ import { ButtonComponent } from '../../../shared/ui/button/button.component';
 export class LandingHeaderComponent {
   private i18n = inject(I18nService);
   private themeService = inject(ThemeService);
+  private router = inject(Router);
+
+  auth = inject(AuthService);
 
   t = computed(() => this.i18n.t());
   isDark = computed(() => this.themeService.effectiveTheme() === 'dark');
 
   logoSrc = computed(() => {
-    return this.isDark() 
-      ? '/assets/brand/logo-full-dark.svg' 
+    return this.isDark()
+      ? '/assets/brand/logo-full-dark.svg'
       : '/assets/brand/logo-full.svg';
   });
 
   onLogInClick(): void {
-    console.log('Log in clicked');
+    this.router.navigate(['/login']);
   }
 
   onGetStartedClick(): void {
-    console.log('Get started clicked');
+    this.router.navigate(['/register']);
+  }
+
+  onLogOutClick(): void {
+    this.auth.logout().subscribe(() => {
+      this.router.navigate(['/'], { replaceUrl: true });
+    });
   }
 }

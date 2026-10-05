@@ -1,6 +1,8 @@
 import { Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { I18nService } from '../../../core/i18n/i18n.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import { ButtonComponent } from '../../../shared/ui/button/button.component';
 
 @Component({
@@ -57,10 +59,12 @@ import { ButtonComponent } from '../../../shared/ui/button/button.component';
 })
 export class LandingCtaComponent {
   private i18n = inject(I18nService);
+  private router = inject(Router);
+  private auth = inject(AuthService);
 
   t = computed(() => this.i18n.t());
 
   onCtaClick(): void {
-    console.log('CTA clicked');
+    this.router.navigate([this.auth.loggedIn() ? '/' : '/register']);
   }
 }
