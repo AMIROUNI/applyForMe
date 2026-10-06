@@ -12,4 +12,5 @@ coverage/
 
 # Misc
 *.log
+*.err
 .DS_Store

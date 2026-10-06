@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 export interface MultiSelectOption {
   value: string;
   label: string;
+  disabled?: boolean;
 }
 
 @Component({
@@ -66,10 +67,15 @@ export interface MultiSelectOption {
           [attr.aria-label]="label()"
         >
           @for (option of options(); track option.value) {
-            <label class="multi-select__option">
+            <label
+              class="multi-select__option"
+              [class.multi-select__option--disabled]="option.disabled === true"
+              [attr.aria-disabled]="option.disabled === true ? 'true' : null"
+            >
               <input
                 type="checkbox"
                 [checked]="isSelected(option.value)"
+                [disabled]="option.disabled === true"
                 (change)="toggleOption(option.value)"
               />
               <span>{{ option.label }}</span>
@@ -187,8 +193,17 @@ export interface MultiSelectOption {
         min-height: 36px;
       }
 
-      .multi-select__option:hover {
+      .multi-select__option:hover:not(.multi-select__option--disabled) {
         background: var(--color-surface-alt);
+      }
+
+      .multi-select__option--disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+
+      .multi-select__option--disabled:hover {
+        background: transparent;
       }
 
       .multi-select__option input {
@@ -222,6 +237,26 @@ export interface MultiSelectOption {
 
       .multi-select__clear:hover {
         background: var(--color-primary-soft);
+      }
+
+      @media (max-width: 768px) {
+        :host {
+          display: flex;
+          width: 100%;
+        }
+
+        .multi-select {
+          width: 100%;
+        }
+
+        .multi-select__control {
+          width: 100%;
+          max-width: none;
+        }
+
+        .multi-select__popover {
+          min-width: min(280px, calc(100vw - 48px));
+        }
       }
     `,
   ],
@@ -262,6 +297,7 @@ export class MultiSelectComponent {
   }
 
   toggleOption(value: string): void {
+    if (this.options().find((option) => option.value === value)?.disabled) return;
     const current = this.selected();
     const next = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
     this.selectionChange.emit(next);

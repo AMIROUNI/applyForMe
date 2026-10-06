@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import type { ConfigService } from '@nestjs/config';
-import type { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import type { Model } from 'mongoose';
 import * as crypto from 'crypto';

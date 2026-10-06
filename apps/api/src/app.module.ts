@@ -7,6 +7,8 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { JobsModule } from './modules/jobs/jobs.module';
+import { ScraperModule } from './modules/scraper/scraper.module';
 import { HealthController } from './health.controller';
 import envConfig, { findEnvFile } from './config/env';
 
@@ -33,6 +35,8 @@ import envConfig, { findEnvFile } from './config/env';
     ]),
     UsersModule,
     AuthModule,
+    JobsModule,
+    ScraperModule,
   ],
   controllers: [HealthController],
   providers: [

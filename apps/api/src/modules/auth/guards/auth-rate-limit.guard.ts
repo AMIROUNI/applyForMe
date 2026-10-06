@@ -1,9 +1,9 @@
 import type { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import type { Reflector } from '@nestjs/core';
+import { Reflector } from '@nestjs/core';
 import { InjectModel } from '@nestjs/mongoose';
 import type { Model } from 'mongoose';
-import type { ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 import { IS_PUBLIC_KEY } from '../../../common/decorators/public.decorator';
 
 interface AuthAttemptDoc {

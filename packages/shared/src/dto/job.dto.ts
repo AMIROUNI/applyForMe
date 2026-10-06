@@ -47,6 +47,7 @@ export const jobSchema = z.object({
 
 export const jobFiltersSchema = z.object({
   countries: z.array(z.string()).default([]),
+  sources: z.array(z.string()).default([]),
   statuses: z.array(jobStatusSchema).default([]),
   experienceLevels: z.array(experienceLevelSchema).default([]),
   remoteTypes: z.array(remoteTypeSchema).default([]),

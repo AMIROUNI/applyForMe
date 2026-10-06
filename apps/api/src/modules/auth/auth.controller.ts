@@ -13,12 +13,12 @@
   HttpException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiCookieAuth } from '@nestjs/swagger';
-import type { ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 import type { Request, Response } from 'express';
-import type { AuthService } from './auth.service';
-import type { RegisterDto } from './dto/register.dto';
-import type { LoginDto } from './dto/login.dto';
-import type { ExchangeCodeDto } from './dto/exchange-code.dto';
+import { AuthService } from './auth.service';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import { ExchangeCodeDto } from './dto/exchange-code.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Public } from '../../common/decorators/public.decorator';

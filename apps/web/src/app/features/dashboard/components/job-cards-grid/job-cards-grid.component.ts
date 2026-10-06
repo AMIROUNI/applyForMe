@@ -87,8 +87,12 @@ const SKELETON_COUNT = 6;
     `
       .grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: minmax(0, 1fr);
         gap: var(--spacing-4);
+      }
+
+      .grid > * {
+        min-width: 0;
       }
 
       .grid__skeleton {
@@ -145,15 +149,15 @@ const SKELETON_COUNT = 6;
         border: 0;
       }
 
-      @media (max-width: 1200px) {
+      @media (min-width: 640px) {
         .grid {
-          grid-template-columns: repeat(2, 1fr);
+          grid-template-columns: repeat(2, minmax(0, 1fr));
         }
       }
 
-      @media (max-width: 768px) {
+      @media (min-width: 1280px) {
         .grid {
-          grid-template-columns: 1fr;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
         }
       }
     `,

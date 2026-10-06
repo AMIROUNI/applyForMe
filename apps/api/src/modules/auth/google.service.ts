@@ -4,11 +4,11 @@ import {
   UnauthorizedException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import type { ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
 import { InjectModel } from '@nestjs/mongoose';
 import type { Model } from 'mongoose';
-import type { UsersService } from '../users/users.service';
+import { UsersService } from '../users/users.service';
 import type { UserDocument } from '../users/user.schema';
 
 export interface GoogleProfile {

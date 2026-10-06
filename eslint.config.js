@@ -32,6 +32,12 @@ module.exports = [
     },
   },
   {
+    files: ['apps/api/**/*.ts'],
+    rules: {
+      '@typescript-eslint/consistent-type-imports': 'off',
+    },
+  },
+  {
     ignores: ['node_modules/', 'dist/', 'coverage/', '.angular/', 'playwright-report/', 'test-results/'],
   },
 ];

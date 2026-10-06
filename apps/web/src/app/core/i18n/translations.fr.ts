@@ -204,4 +204,36 @@ export const frTranslations: Record<string, string> = {
     'Impossible de charger vos offres. Vérifiez votre connexion et réessayez.',
   'dashboard.scraperComingSoon':
     "Le panneau scraper arrive à la prochaine étape — recherche et cartes d'offres sont prêtes.",
+  'dashboard.scraperSettings': 'Paramètres du scraper',
+  'dashboard.hideScraper': 'Masquer les paramètres du scraper',
+  'dashboard.scraperRunning': 'Scrapage des sources… ({done}/{total} terminés)',
+  'dashboard.scraperDone': 'Scrapage terminé — {n} nouvelles offres trouvées.',
+  'dashboard.scraperNoJobs': 'Scrapage terminé — aucune offre ne correspond à vos mots-clés.',
+  'dashboard.scraperFailed': 'Échec du scrapage — {n} source(s) injoignable(s).',
+  'dashboard.scraperStartFailed': 'Impossible de lancer le scraper. Réessayez.',
+  'dashboard.scraperPollFailed': 'Suivi du scraper perdu. Veuillez actualiser la page.',
+
+  // Scraper sidebar
+  'scraper.title': 'Scraper',
+  'scraper.subtitle': 'Choisissez les sources et les mots-clés que nos agents doivent scanner.',
+  'scraper.sources': 'Sources',
+  'scraper.keywords': 'Mots-clés',
+  'scraper.keywordsPlaceholder': 'react, remote, paris',
+  'scraper.countries': 'Pays ciblés',
+  'scraper.remoteOnly': 'Télétravail uniquement',
+  'scraper.run': 'Lancer le scraper',
+  'scraper.hint':
+    'Les offres sont récupérées en direct depuis des API et job boards publics. Certains sites (LinkedIn, Indeed, TanitJobs) bloquent l’automatisation et restent indisponibles.',
+
+  // Sources
+  'source.linkedin': 'LinkedIn',
+  'source.indeed': 'Indeed',
+  'source.tanitjobs': 'TanitJobs',
+  'source.emploiNat': 'Emploi.nat.tn',
+  'source.keepjob': 'KeepJob',
+  'source.wwr': 'We Work Remotely',
+  'source.remotive': 'Remotive',
+  'source.remoteok': 'RemoteOK',
+  'source.arbeitnow': 'Arbeitnow',
+  'source.unavailable': 'indisponible',
 };

@@ -77,8 +77,9 @@ import { ButtonComponent } from '../../shared/ui/button/button.component';
         margin: 0 auto;
         padding: 0 var(--spacing-4);
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
-        gap: var(--spacing-5);
+        gap: var(--spacing-4) var(--spacing-5);
       }
 
       .app-header__logo {
@@ -96,6 +97,7 @@ import { ButtonComponent } from '../../shared/ui/button/button.component';
         align-items: center;
         gap: var(--spacing-4);
         flex: 1;
+        min-width: 0;
       }
 
       .app-header__link {
@@ -131,6 +133,8 @@ import { ButtonComponent } from '../../shared/ui/button/button.component';
         display: flex;
         align-items: center;
         gap: var(--spacing-2);
+        margin-left: auto;
+        flex-shrink: 0;
       }
 
       .app-header__user {
@@ -145,7 +149,7 @@ import { ButtonComponent } from '../../shared/ui/button/button.component';
 
       @media (max-width: 768px) {
         .app-header__container {
-          gap: var(--spacing-3);
+          gap: var(--spacing-3) var(--spacing-4);
         }
 
         .app-header__user {
@@ -157,13 +161,28 @@ import { ButtonComponent } from '../../shared/ui/button/button.component';
         }
       }
 
+      @media (max-width: 640px) {
+        .app-header__nav {
+          display: none;
+        }
+      }
+
       @media (max-width: 480px) {
         .app-header {
           padding: var(--spacing-2) 0;
         }
 
-        .app-header__nav {
-          gap: var(--spacing-2);
+        .app-header__container {
+          gap: var(--spacing-2) var(--spacing-3);
+          padding: 0 var(--spacing-3);
+        }
+
+        .app-header__logo-img {
+          height: 24px;
+        }
+
+        .app-header__actions {
+          gap: var(--spacing-1);
         }
       }
     `,

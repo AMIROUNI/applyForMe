@@ -1,4 +1,13 @@
-import { Component, computed, inject, input, output, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+  untracked,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import type {
   DatePosted,
@@ -23,6 +32,19 @@ import {
 } from '../../data/dashboard.constants';
 
 const QUERY_DEBOUNCE_MS = 300;
+
+const sameList = (a: string[], b: string[]): boolean =>
+  a.length === b.length && a.every((value, index) => value === b[index]);
+
+const sameFilters = (a: JobFilters, b: JobFilters): boolean =>
+  a.minScore === b.minScore &&
+  a.datePosted === b.datePosted &&
+  sameList(a.countries, b.countries) &&
+  sameList(a.sources, b.sources) &&
+  sameList(a.statuses, b.statuses) &&
+  sameList(a.experienceLevels, b.experienceLevels) &&
+  sameList(a.remoteTypes, b.remoteTypes) &&
+  sameList(a.jobTypes, b.jobTypes);
 
 @Component({
   selector: 'app-search-filter-bar',
@@ -106,7 +128,9 @@ const QUERY_DEBOUNCE_MS = 300;
           >
             <option value="">{{ t()['filters.experience'] }} — {{ t()['filters.any'] }}</option>
             @for (opt of experienceOptions(); track opt.value) {
-              <option [value]="opt.value">{{ opt.label }}</option>
+              <option [value]="opt.value" [selected]="singleExperience() === opt.value">
+                {{ opt.label }}
+              </option>
             }
           </select>
         </label>
@@ -120,7 +144,9 @@ const QUERY_DEBOUNCE_MS = 300;
           >
             <option value="">{{ t()['filters.remote'] }} — {{ t()['filters.any'] }}</option>
             @for (opt of remoteOptions(); track opt.value) {
-              <option [value]="opt.value">{{ opt.label }}</option>
+              <option [value]="opt.value" [selected]="singleRemote() === opt.value">
+                {{ opt.label }}
+              </option>
             }
           </select>
         </label>
@@ -134,7 +160,9 @@ const QUERY_DEBOUNCE_MS = 300;
           >
             <option value="">{{ t()['filters.jobType'] }} — {{ t()['filters.any'] }}</option>
             @for (opt of jobTypeOptions(); track opt.value) {
-              <option [value]="opt.value">{{ opt.label }}</option>
+              <option [value]="opt.value" [selected]="singleJobType() === opt.value">
+                {{ opt.label }}
+              </option>
             }
           </select>
         </label>
@@ -147,7 +175,9 @@ const QUERY_DEBOUNCE_MS = 300;
             (change)="onDatePostedChange($any($event.target).value)"
           >
             @for (opt of datePostedOptions(); track opt.value) {
-              <option [value]="opt.value">{{ opt.label }}</option>
+              <option [value]="opt.value" [selected]="draft().datePosted === opt.value">
+                {{ opt.label }}
+              </option>
             }
           </select>
         </label>
@@ -160,7 +190,9 @@ const QUERY_DEBOUNCE_MS = 300;
             (change)="onMinScoreChange($any($event.target).value)"
           >
             @for (opt of minScoreOptions(); track opt.value) {
-              <option [value]="opt.value">{{ opt.label }}</option>
+              <option [value]="opt.value" [selected]="minScoreValue() === opt.value">
+                {{ opt.label }}
+              </option>
             }
           </select>
         </label>
@@ -263,8 +295,14 @@ const QUERY_DEBOUNCE_MS = 300;
         gap: var(--spacing-2);
       }
 
+      .filter-bar__filters > app-multi-select,
+      .filter-bar__actions {
+        flex-shrink: 0;
+      }
+
       .filter-bar__field {
         display: inline-flex;
+        flex-shrink: 0;
       }
 
       .filter-bar__select {
@@ -350,17 +388,36 @@ const QUERY_DEBOUNCE_MS = 300;
       }
 
       @media (max-width: 768px) {
-        .filter-bar__filters {
-          flex-wrap: nowrap;
-          overflow-x: auto;
-          padding-bottom: var(--spacing-1);
-          scrollbar-width: thin;
+        .filter-bar {
+          padding: var(--spacing-3);
+        }
+
+        .filter-bar__search-input {
+          height: 44px;
+        }
+
+        .filter-bar__filters > app-multi-select,
+        .filter-bar__field {
+          flex: 1 1 180px;
+          min-width: 0;
+        }
+
+        .filter-bar__select {
+          width: 100%;
+          max-width: none;
         }
 
         .filter-bar__actions {
+          flex: 1 1 100%;
           margin-left: 0;
-          position: sticky;
-          right: 0;
+          justify-content: flex-start;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .filter-bar__filters > app-multi-select,
+        .filter-bar__field {
+          flex: 1 1 100%;
         }
       }
     `,
@@ -371,6 +428,7 @@ export class SearchFilterBarComponent {
   private queryTimer: ReturnType<typeof setTimeout> | null = null;
 
   filters = input<JobFilters>(emptyJobFilters());
+  query = input('');
   loading = input(false);
 
   queryChange = output<string>();
@@ -411,10 +469,27 @@ export class SearchFilterBarComponent {
     this.draft().minScore === null ? '' : String(this.draft().minScore),
   );
 
+  constructor() {
+    effect(() => {
+      const incoming = this.filters();
+      const current = untracked(() => this.draft());
+      if (!sameFilters(incoming, current)) this.draft.set(incoming);
+    });
+
+    effect(() => {
+      const incoming = this.query();
+      const current = untracked(() => this.queryDraft());
+      if (incoming !== current && incoming !== current.trim()) {
+        this.queryDraft.set(incoming);
+      }
+    });
+  }
+
   activeFilterCount = computed(() => {
     const f = this.draft();
     return (
       f.countries.length +
+      f.sources.length +
       f.statuses.length +
       f.experienceLevels.length +
       f.remoteTypes.length +

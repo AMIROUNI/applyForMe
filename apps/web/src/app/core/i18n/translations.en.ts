@@ -199,4 +199,36 @@ export const enTranslations: Record<string, string> = {
   'dashboard.error.loadFailed': 'We could not load your jobs. Check your connection and try again.',
   'dashboard.scraperComingSoon':
     'The scraper panel arrives in the next step — search and job cards are ready.',
+  'dashboard.scraperSettings': 'Scraper settings',
+  'dashboard.hideScraper': 'Hide scraper settings',
+  'dashboard.scraperRunning': 'Scraping sources… ({done} of {total} finished)',
+  'dashboard.scraperDone': 'Scraping finished — {n} new job offers found.',
+  'dashboard.scraperNoJobs': 'Scraping finished — no new jobs matched your keywords.',
+  'dashboard.scraperFailed': 'Scraping failed — {n} source(s) could not be reached.',
+  'dashboard.scraperStartFailed': 'Could not start the scraper. Please try again.',
+  'dashboard.scraperPollFailed': 'Lost track of the scraper run. Please refresh the page.',
+
+  // Scraper sidebar
+  'scraper.title': 'Scraper',
+  'scraper.subtitle': 'Choose the sources and keywords our agents should scan.',
+  'scraper.sources': 'Sources',
+  'scraper.keywords': 'Keywords',
+  'scraper.keywordsPlaceholder': 'react, remote, paris',
+  'scraper.countries': 'Target countries',
+  'scraper.remoteOnly': 'Remote only',
+  'scraper.run': 'Run scraper',
+  'scraper.hint':
+    'Jobs are fetched live from public APIs and job boards. Some sites (LinkedIn, Indeed, TanitJobs) block automation and stay unavailable.',
+
+  // Sources
+  'source.linkedin': 'LinkedIn',
+  'source.indeed': 'Indeed',
+  'source.tanitjobs': 'TanitJobs',
+  'source.emploiNat': 'Emploi.nat.tn',
+  'source.keepjob': 'KeepJob',
+  'source.wwr': 'We Work Remotely',
+  'source.remotive': 'Remotive',
+  'source.remoteok': 'RemoteOK',
+  'source.arbeitnow': 'Arbeitnow',
+  'source.unavailable': 'unavailable',
 };

@@ -1,9 +1,9 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import type { ConfigService } from '@nestjs/config';
-import type { UsersService } from '../users/users.service';
+import { ConfigService } from '@nestjs/config';
+import { UsersService } from '../users/users.service';
 import type { UserDocument } from '../users/user.schema';
-import type { TokenService } from './token.service';
-import type { GoogleService } from './google.service';
+import { TokenService } from './token.service';
+import { GoogleService } from './google.service';
 import type { RegisterDto } from './dto/register.dto';
 import type { LoginDto } from './dto/login.dto';
 

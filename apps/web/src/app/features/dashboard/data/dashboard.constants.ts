@@ -43,3 +43,15 @@ export const MIN_SCORE_OPTIONS: LabelledOption[] = [
   { value: '70', label: '70+', labelKey: 'filters.minScore.70' },
   { value: '85', label: '85+', labelKey: 'filters.minScore.85' },
 ];
+
+export const SOURCE_OPTIONS: LabelledOption[] = [
+  { value: 'remotive', label: 'Remotive', labelKey: 'source.remotive' },
+  { value: 'remoteok', label: 'RemoteOK', labelKey: 'source.remoteok' },
+  { value: 'arbeitnow', label: 'Arbeitnow', labelKey: 'source.arbeitnow' },
+  { value: 'weworkremotely', label: 'We Work Remotely', labelKey: 'source.wwr' },
+  { value: 'emploi_nat_tn', label: 'Emploi.nat.tn', labelKey: 'source.emploiNat', disabled: true },
+  { value: 'tanitjobs', label: 'TanitJobs', labelKey: 'source.tanitjobs', disabled: true },
+  { value: 'keepjob', label: 'KeepJob', labelKey: 'source.keepjob', disabled: true },
+  { value: 'linkedin', label: 'LinkedIn', labelKey: 'source.linkedin', disabled: true },
+  { value: 'indeed', label: 'Indeed', labelKey: 'source.indeed', disabled: true },
+];
