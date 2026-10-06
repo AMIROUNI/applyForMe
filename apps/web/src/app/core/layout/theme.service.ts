@@ -12,7 +12,7 @@ export class ThemeService {
   private systemDark = signal(false);
   private mediaQueryListener?: MediaQueryList;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+  constructor(@Inject(PLATFORM_ID) private platformId: object) {
     if (isPlatformBrowser(this.platformId)) {
       this.init();
     }
@@ -70,7 +70,8 @@ export class ThemeService {
 
   toggle(): void {
     const current = this.theme();
-    const next: ThemeMode = current === 'system' ? 'light' : current === 'light' ? 'dark' : 'system';
+    const next: ThemeMode =
+      current === 'system' ? 'light' : current === 'light' ? 'dark' : 'system';
     this.setTheme(next);
   }
 

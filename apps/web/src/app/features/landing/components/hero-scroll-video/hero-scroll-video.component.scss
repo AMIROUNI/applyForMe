@@ -26,6 +26,18 @@
   z-index: 0;
 }
 
+.hero-scroll-video__video {
+  opacity: 0;
+  will-change: opacity;
+  transition: opacity 300ms var(--transition-ease);
+  pointer-events: none;
+}
+
+.hero-scroll-video__video--active {
+  opacity: 1;
+  z-index: 1;
+}
+
 .hero-scroll-video__poster {
   will-change: opacity;
   transition: opacity 300ms var(--transition-ease);

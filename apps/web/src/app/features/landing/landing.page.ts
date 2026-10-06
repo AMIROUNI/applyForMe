@@ -17,7 +17,7 @@ import { LandingFooterComponent } from './components/landing-footer.component';
     LandingHowItWorksComponent,
     LandingFeaturesComponent,
     LandingCtaComponent,
-    LandingFooterComponent
+    LandingFooterComponent,
   ],
   template: `
     <div class="landing-page">
@@ -31,16 +31,31 @@ import { LandingFooterComponent } from './components/landing-footer.component';
       <app-landing-footer></app-landing-footer>
     </div>
   `,
-  styles: [`
-    .landing-page {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+  styles: [
+    `
+      .landing-page {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
 
-    .landing-page__main {
-      flex: 1;
-    }
-  `]
+      .landing-page__main {
+        flex: 1;
+      }
+    `,
+  ],
 })
-export class LandingPageComponent {}
+export class LandingPageComponent {
+  constructor() {
+    // Preload the hero poster only on the page that actually uses it,
+    // so auth pages don't warn about an unused preloaded resource.
+    if (typeof document !== 'undefined' && !document.querySelector('link[data-hero-poster]')) {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = '/media/hero-poster.webp';
+      link.setAttribute('data-hero-poster', '');
+      document.head.appendChild(link);
+    }
+  }
+}

@@ -14,7 +14,7 @@ export class I18nService {
 
   lang = signal<Locale>('en');
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+  constructor(@Inject(PLATFORM_ID) private platformId: object) {
     if (isPlatformBrowser(this.platformId)) {
       this.init();
     }

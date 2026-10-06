@@ -1,29 +1,28 @@
 <section class="hero-scroll-video" #sectionEl>
   <div class="hero-scroll-video__sticky">
-    @if (showVideo()) {
-      <video
-        #videoEl
-        class="hero-scroll-video__video"
-        [src]="videoSrc()"
-        [poster]="posterSrc"
-        playsinline
-        muted
-        (loadedmetadata)="onVideoLoaded()"
-        (error)="onVideoError()"
-        aria-hidden="true"
-      ></video>
-    } @else {
-      <img
-        class="hero-scroll-video__poster"
-        [src]="posterSrc"
-        alt=""
-        aria-hidden="true"
-        width="1280"
-        height="720"
-        loading="eager"
-        decoding="async"
-      >
-    }
+    <video
+      #videoEl
+      class="hero-scroll-video__video"
+      [src]="videoSrc()"
+      [poster]="posterSrc"
+      playsinline
+      muted
+      (loadedmetadata)="onVideoLoaded()"
+      (error)="onVideoError()"
+      aria-hidden="true"
+      [class.hero-scroll-video__video--active]="showVideo() && ready()"
+    ></video>
+
+    <img
+      class="hero-scroll-video__poster"
+      [src]="posterSrc"
+      alt=""
+      aria-hidden="true"
+      width="1280"
+      height="720"
+      loading="eager"
+      decoding="async"
+    >
 
     <div class="hero-scroll-video__scrim" [style]="getScrimStyle()"></div>
 

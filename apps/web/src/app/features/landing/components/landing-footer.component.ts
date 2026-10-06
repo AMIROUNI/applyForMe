@@ -21,7 +21,7 @@ import { ThemeService } from '../../../core/layout/theme.service';
                 height="45"
                 loading="lazy"
                 decoding="async"
-              >
+              />
             </a>
             <p class="landing-footer__tagline">{{ t()['footer.madeWith'] }}</p>
           </div>
@@ -29,27 +29,45 @@ import { ThemeService } from '../../../core/layout/theme.service';
           <nav class="landing-footer__nav" aria-label="Product links">
             <h3 class="landing-footer__nav-title">{{ t()['footer.product'] }}</h3>
             <ul class="landing-footer__nav-list">
-              <li><a href="#">{{ t()['footer.pricing'] }}</a></li>
-              <li><a href="#">{{ t()['footer.changelog'] }}</a></li>
-              <li><a href="#">{{ t()['footer.docs'] }}</a></li>
+              <li>
+                <a href="#">{{ t()['footer.pricing'] }}</a>
+              </li>
+              <li>
+                <a href="#">{{ t()['footer.changelog'] }}</a>
+              </li>
+              <li>
+                <a href="#">{{ t()['footer.docs'] }}</a>
+              </li>
             </ul>
           </nav>
 
           <nav class="landing-footer__nav" aria-label="Company links">
             <h3 class="landing-footer__nav-title">{{ t()['footer.company'] }}</h3>
             <ul class="landing-footer__nav-list">
-              <li><a href="#">{{ t()['footer.about'] }}</a></li>
-              <li><a href="#">{{ t()['footer.blog'] }}</a></li>
-              <li><a href="#">{{ t()['footer.careers'] }}</a></li>
+              <li>
+                <a href="#">{{ t()['footer.about'] }}</a>
+              </li>
+              <li>
+                <a href="#">{{ t()['footer.blog'] }}</a>
+              </li>
+              <li>
+                <a href="#">{{ t()['footer.careers'] }}</a>
+              </li>
             </ul>
           </nav>
 
           <nav class="landing-footer__nav" aria-label="Legal links">
             <h3 class="landing-footer__nav-title">{{ t()['footer.legal'] }}</h3>
             <ul class="landing-footer__nav-list">
-              <li><a href="#">{{ t()['footer.privacy'] }}</a></li>
-              <li><a href="#">{{ t()['footer.terms'] }}</a></li>
-              <li><a href="#">{{ t()['footer.cookies'] }}</a></li>
+              <li>
+                <a href="#">{{ t()['footer.privacy'] }}</a>
+              </li>
+              <li>
+                <a href="#">{{ t()['footer.terms'] }}</a>
+              </li>
+              <li>
+                <a href="#">{{ t()['footer.cookies'] }}</a>
+              </li>
             </ul>
           </nav>
         </div>
@@ -60,97 +78,99 @@ import { ThemeService } from '../../../core/layout/theme.service';
       </div>
     </footer>
   `,
-  styles: [`
-    .landing-footer {
-      background: var(--color-bg);
-      border-top: 1px solid var(--color-border);
-      padding: var(--spacing-8) 0 var(--spacing-5);
-    }
-
-    .landing-footer__container {
-      max-width: var(--max-content-width);
-      margin: 0 auto;
-      padding: 0 var(--spacing-4);
-    }
-
-    .landing-footer__grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: var(--spacing-6);
-      margin-bottom: var(--spacing-6);
-    }
-
-    @media (min-width: 640px) {
-      .landing-footer__grid {
-        grid-template-columns: repeat(2, 1fr);
+  styles: [
+    `
+      .landing-footer {
+        background: var(--color-bg);
+        border-top: 1px solid var(--color-border);
+        padding: var(--spacing-8) 0 var(--spacing-5);
       }
-    }
 
-    @media (min-width: 1024px) {
-      .landing-footer__grid {
-        grid-template-columns: 2fr repeat(3, 1fr);
+      .landing-footer__container {
+        max-width: var(--max-content-width);
+        margin: 0 auto;
+        padding: 0 var(--spacing-4);
       }
-    }
 
-    .landing-footer__logo {
-      text-decoration: none;
-      display: inline-block;
-      margin-bottom: var(--spacing-3);
-    }
+      .landing-footer__grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--spacing-6);
+        margin-bottom: var(--spacing-6);
+      }
 
-    .landing-footer__logo-img {
-      height: 36px;
-      width: auto;
-    }
+      @media (min-width: 640px) {
+        .landing-footer__grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
 
-    .landing-footer__tagline {
-      font-size: var(--text-sm);
-      color: var(--color-text-muted);
-      margin: 0;
-      max-width: 280px;
-    }
+      @media (min-width: 1024px) {
+        .landing-footer__grid {
+          grid-template-columns: 2fr repeat(3, 1fr);
+        }
+      }
 
-    .landing-footer__nav-title {
-      font-family: var(--font-heading);
-      font-weight: var(--font-weight-semibold);
-      font-size: var(--text-sm);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--color-text);
-      margin: 0 0 var(--spacing-3);
-    }
+      .landing-footer__logo {
+        text-decoration: none;
+        display: inline-block;
+        margin-bottom: var(--spacing-3);
+      }
 
-    .landing-footer__nav-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      gap: var(--spacing-2);
-    }
+      .landing-footer__logo-img {
+        height: 36px;
+        width: auto;
+      }
 
-    .landing-footer__nav-list a {
-      font-size: var(--text-sm);
-      color: var(--color-text-muted);
-      transition: color var(--transition-duration) var(--transition-ease);
-    }
+      .landing-footer__tagline {
+        font-size: var(--text-sm);
+        color: var(--color-text-muted);
+        margin: 0;
+        max-width: 280px;
+      }
 
-    .landing-footer__nav-list a:hover {
-      color: var(--color-primary);
-    }
+      .landing-footer__nav-title {
+        font-family: var(--font-heading);
+        font-weight: var(--font-weight-semibold);
+        font-size: var(--text-sm);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--color-text);
+        margin: 0 0 var(--spacing-3);
+      }
 
-    .landing-footer__bottom {
-      padding-top: var(--spacing-5);
-      border-top: 1px solid var(--color-border);
-      text-align: center;
-    }
+      .landing-footer__nav-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-2);
+      }
 
-    .landing-footer__copyright {
-      font-size: var(--text-sm);
-      color: var(--color-text-muted);
-      margin: 0;
-    }
-  `]
+      .landing-footer__nav-list a {
+        font-size: var(--text-sm);
+        color: var(--color-text-muted);
+        transition: color var(--transition-duration) var(--transition-ease);
+      }
+
+      .landing-footer__nav-list a:hover {
+        color: var(--color-primary);
+      }
+
+      .landing-footer__bottom {
+        padding-top: var(--spacing-5);
+        border-top: 1px solid var(--color-border);
+        text-align: center;
+      }
+
+      .landing-footer__copyright {
+        font-size: var(--text-sm);
+        color: var(--color-text-muted);
+        margin: 0;
+      }
+    `,
+  ],
 })
 export class LandingFooterComponent {
   private i18n = inject(I18nService);
@@ -160,8 +180,6 @@ export class LandingFooterComponent {
   isDark = computed(() => this.themeService.effectiveTheme() === 'dark');
 
   logoSrc = computed(() => {
-    return this.isDark() 
-      ? '/assets/brand/logo-full-dark.svg' 
-      : '/assets/brand/logo-full.svg';
+    return this.isDark() ? '/assets/brand/logo-full-dark.svg' : '/assets/brand/logo-full.svg';
   });
 }

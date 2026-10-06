@@ -1,24 +1,10 @@
-import {
-  Component,
-  inject,
-  PLATFORM_ID,
-  signal,
-  computed,
-  OnDestroy,
-  AfterViewInit,
-  ViewChild,
-  ElementRef,
-} from '@angular/core';
+import type { OnDestroy, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, inject, PLATFORM_ID, signal, computed, ViewChild } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { I18nService } from '../../../../core/i18n/i18n.service';
 import { ButtonComponent } from '../../../../shared/ui/button/button.component';
 import { ThemeService } from '../../../../core/layout/theme.service';
-import {
-  computeProgress,
-  lerp,
-  shouldSeek,
-  smoothstep,
-} from './hero-scroll-video.util';
+import { computeProgress, lerp, shouldSeek, smoothstep } from './hero-scroll-video.util';
 
 export type HeroMode = 'scrub' | 'loop' | 'static' | 'loading';
 
@@ -93,7 +79,8 @@ export class HeroScrollVideoComponent implements AfterViewInit, OnDestroy {
     const nav = navigator as NavigatorWithConnection;
     const saveData = nav.connection?.saveData === true;
     const effectiveType = nav.connection?.effectiveType;
-    const isSlowConnection = effectiveType === 'slow-2g' || effectiveType === '2g' || effectiveType === '3g';
+    const isSlowConnection =
+      effectiveType === 'slow-2g' || effectiveType === '2g' || effectiveType === '3g';
 
     if (prefersReduced || saveData || isSlowConnection) {
       this.mode.set('static');
@@ -111,12 +98,11 @@ export class HeroScrollVideoComponent implements AfterViewInit, OnDestroy {
         for (const entry of entries) {
           if (entry.isIntersecting && !this.videoLoaded) {
             this.loadVideo();
-            this.videoLoaded = true;
             this.heroObserver?.unobserve(this.sectionEl!.nativeElement);
           }
         }
       },
-      { rootMargin: '100px', threshold: 0 }
+      { rootMargin: '100px', threshold: 0 },
     );
     this.heroObserver.observe(this.sectionEl.nativeElement);
   }
@@ -130,18 +116,19 @@ export class HeroScrollVideoComponent implements AfterViewInit, OnDestroy {
   }
 
   private maybeLoadVideoEarly(): void {
-    if (document.readyState === 'complete' && this.sectionEl?.nativeElement) {
+    if (document.readyState === 'complete' && this.sectionEl?.nativeElement && !this.videoLoaded) {
       const rect = this.sectionEl.nativeElement.getBoundingClientRect();
-      if (rect.top < window.innerHeight + 200 && !this.videoLoaded) {
+      if (rect.top < window.innerHeight + 200) {
         this.loadVideo();
-        this.videoLoaded = true;
       }
     }
   }
 
   private loadVideo(): void {
     const video = this.videoEl?.nativeElement;
-    if (!video || this.mode() === 'static') return;
+    if (!video || this.mode() === 'static' || this.videoLoaded) return;
+
+    this.videoLoaded = true;
 
     const src = this.mode() === 'loop' ? '/media/hero-loop.mp4' : '/media/hero-scrub.mp4';
     this.videoSrc.set(src);
@@ -154,6 +141,7 @@ export class HeroScrollVideoComponent implements AfterViewInit, OnDestroy {
     video.addEventListener('loadedmetadata', () => {
       this.videoDuration.set(video.duration);
       this.ready.set(true);
+      this.computeSectionMetrics();
     });
 
     video.addEventListener('canplay', () => {
@@ -165,6 +153,7 @@ export class HeroScrollVideoComponent implements AfterViewInit, OnDestroy {
     video.addEventListener('error', () => {
       this.mode.set('static');
       this.showVideo.set(false);
+      this.videoLoaded = false;
     });
 
     if (this.mode() === 'scrub') {
@@ -174,7 +163,7 @@ export class HeroScrollVideoComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  private setupVideoForScrub(video: HTMLVideoElement): void {
+  private setupVideoForScrub(_video: HTMLVideoElement): void {
     this.computeSectionMetrics();
     this.setupScroll();
     this.setupIntersectionObserver();
@@ -193,7 +182,7 @@ export class HeroScrollVideoComponent implements AfterViewInit, OnDestroy {
           }
         }
       },
-      { rootMargin: '50px', threshold: 0.1 }
+      { rootMargin: '50px', threshold: 0.1 },
     );
     loopObserver.observe(video);
   }
@@ -233,7 +222,7 @@ export class HeroScrollVideoComponent implements AfterViewInit, OnDestroy {
           this.isSectionVisible = entry.isIntersecting;
         }
       },
-      { rootMargin: '0px', threshold: 0 }
+      { rootMargin: '0px', threshold: 0 },
     );
     this.intersectionObserver.observe(this.sectionEl.nativeElement);
   }
