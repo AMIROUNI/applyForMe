@@ -34,6 +34,7 @@ import envConfig, { findEnvFile } from './config/env';
     UsersModule,
     AuthModule,
   ],
+  controllers: [HealthController],
   providers: [
     {
       provide: APP_GUARD,

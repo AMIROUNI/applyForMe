@@ -17,7 +17,7 @@ import { LandingFooterComponent } from './components/landing-footer.component';
     LandingHowItWorksComponent,
     LandingFeaturesComponent,
     LandingCtaComponent,
-    LandingFooterComponent
+    LandingFooterComponent,
   ],
   template: `
     <div class="landing-page">
@@ -31,17 +31,19 @@ import { LandingFooterComponent } from './components/landing-footer.component';
       <app-landing-footer></app-landing-footer>
     </div>
   `,
-  styles: [`
-    .landing-page {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+  styles: [
+    `
+      .landing-page {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
 
-    .landing-page__main {
-      flex: 1;
-    }
-  `]
+      .landing-page__main {
+        flex: 1;
+      }
+    `,
+  ],
 })
 export class LandingPageComponent {
   constructor() {

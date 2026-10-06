@@ -1,8 +1,9 @@
-import { Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+import type { CanActivate, ExecutionContext } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import type { Reflector } from '@nestjs/core';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { ConfigService } from '@nestjs/config';
+import type { Model } from 'mongoose';
+import type { ConfigService } from '@nestjs/config';
 import { IS_PUBLIC_KEY } from '../../../common/decorators/public.decorator';
 
 interface AuthAttemptDoc {
@@ -21,7 +22,7 @@ export class AuthRateLimitGuard implements CanActivate {
   constructor(
     config: ConfigService,
     private reflector: Reflector,
-    @InjectModel('AuthAttempt') attemptModel: Model<AuthAttemptDoc>,
+    @InjectModel('AuthAttempt') attemptModel: Model<AuthAttemptDoc>
   ) {
     this.attemptModel = attemptModel;
     const [limit, windowMs] = (config.get<string>('AUTH_RATE_LIMIT') ?? '5/60000').split('/');
@@ -49,7 +50,7 @@ export class AuthRateLimitGuard implements CanActivate {
     if (doc.count > this.limit) {
       throw new HttpException(
         { code: 'RATE_LIMITED', message: 'Too many login attempts, please try again later' },
-        HttpStatus.TOO_MANY_REQUESTS,
+        HttpStatus.TOO_MANY_REQUESTS
       );
     }
 
@@ -71,7 +72,7 @@ export class AuthRateLimitGuard implements CanActivate {
         .findOneAndUpdate(
           { key },
           { $set: { count: 1, resetAt: new Date(now.getTime() + this.windowMs) } },
-          { upsert: true, new: true },
+          { upsert: true, new: true }
         )
         .exec();
       return fresh as AuthAttemptDoc;
@@ -89,12 +90,15 @@ export class AuthRateLimitGuard implements CanActivate {
 
   private clearOnSuccess(
     response: { on?: (event: string, cb: () => void) => void; statusCode?: number },
-    key: string,
+    key: string
   ): void {
     if (typeof response?.on !== 'function') return;
     response.on('finish', () => {
       if ((response.statusCode ?? 500) < 400) {
-        this.attemptModel.deleteOne({ key }).exec().catch(() => undefined);
+        this.attemptModel
+          .deleteOne({ key })
+          .exec()
+          .catch(() => undefined);
       }
     });
   }

@@ -1,5 +1,6 @@
 import { inject } from '@angular/core';
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import type { HttpInterceptorFn } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthService, hasSessionMarker } from './auth.service';
 
@@ -36,7 +37,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         catchError(() => throwError(() => err)),
         // Refresh succeeded: replay the original request with the fresh cookie.
         // The marker header prevents an infinite retry loop on a second 401.
-        switchMap(() => next(req.clone({ withCredentials: true, headers: req.headers.set(RETRY_HEADER, '1') }))),
+        switchMap(() =>
+          next(req.clone({ withCredentials: true, headers: req.headers.set(RETRY_HEADER, '1') })),
+        ),
       );
     }),
   );

@@ -2,7 +2,7 @@ export function computeProgress(
   scrollY: number,
   sectionTop: number,
   sectionHeight: number,
-  viewportHeight: number
+  viewportHeight: number,
 ): number {
   const start = sectionTop;
   const end = sectionTop + sectionHeight - viewportHeight;
@@ -14,11 +14,7 @@ export function lerp(current: number, target: number, factor: number): number {
   return current + (target - current) * factor;
 }
 
-export function shouldSeek(
-  currentTime: number,
-  targetTime: number,
-  duration: number
-): boolean {
+export function shouldSeek(currentTime: number, targetTime: number, duration: number): boolean {
   const threshold = duration / 60;
   return Math.abs(targetTime - currentTime) > threshold;
 }

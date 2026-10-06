@@ -4,17 +4,17 @@ const typescriptParser = require('@typescript-eslint/parser');
 const prettierConfig = require('eslint-config-prettier');
 const prettierPlugin = require('eslint-plugin-prettier');
 
+const tsEslintOverrides = typescriptEslint.configs['eslint-recommended'].overrides[0];
+
 module.exports = [
   js.configs.recommended,
-  ...typescriptEslint.configs.recommended,
   {
-    files: ['**/*.ts'],
+    files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
     languageOptions: {
       parser: typescriptParser,
       parserOptions: {
         ecmaVersion: 2022,
         sourceType: 'module',
-        project: ['./tsconfig.json', './apps/*/tsconfig.json', './packages/*/tsconfig.json'],
       },
     },
     plugins: {
@@ -22,7 +22,10 @@ module.exports = [
       prettier: prettierPlugin,
     },
     rules: {
-      'prettier/prettier': 'error',
+      ...tsEslintOverrides.rules,
+      ...typescriptEslint.configs.recommended.rules,
+      ...prettierConfig.rules,
+      'prettier/prettier': ['error', { endOfLine: 'auto' }],
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/consistent-type-imports': 'error',

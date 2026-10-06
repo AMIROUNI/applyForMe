@@ -1,11 +1,24 @@
-﻿import { Controller, Post, Get, Body, Req, Res, HttpCode, HttpStatus, UseGuards, Logger, UnauthorizedException, HttpException } from '@nestjs/common';
+﻿import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Req,
+  Res,
+  HttpCode,
+  HttpStatus,
+  UseGuards,
+  Logger,
+  UnauthorizedException,
+  HttpException,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiCookieAuth } from '@nestjs/swagger';
-import { ConfigService } from '@nestjs/config';
-import { Request, Response } from 'express';
-import { AuthService } from './auth.service';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
-import { ExchangeCodeDto } from './dto/exchange-code.dto';
+import type { ConfigService } from '@nestjs/config';
+import type { Request, Response } from 'express';
+import type { AuthService } from './auth.service';
+import type { RegisterDto } from './dto/register.dto';
+import type { LoginDto } from './dto/login.dto';
+import type { ExchangeCodeDto } from './dto/exchange-code.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Public } from '../../common/decorators/public.decorator';
@@ -24,7 +37,7 @@ export class AuthController {
 
   constructor(
     private readonly auth: AuthService,
-    private readonly config: ConfigService,
+    private readonly config: ConfigService
   ) {}
 
   @Post('register')
@@ -67,7 +80,10 @@ export class AuthController {
   async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = req.cookies?.af_rt;
     if (!refreshToken) {
-      throw new UnauthorizedException({ code: 'NO_REFRESH_TOKEN', message: 'Refresh token not found' });
+      throw new UnauthorizedException({
+        code: 'NO_REFRESH_TOKEN',
+        message: 'Refresh token not found',
+      });
     }
     const result = await this.auth.refresh(refreshToken);
     this.setAuthCookies(res, result.refreshToken, result.accessToken, result.expiresIn);
@@ -86,7 +102,9 @@ export class AuthController {
       try {
         await this.auth.logout(refreshToken);
       } catch (err) {
-        this.logger.warn(`Failed to revoke refresh token on logout: ${err instanceof Error ? err.message : 'unknown'}`);
+        this.logger.warn(
+          `Failed to revoke refresh token on logout: ${err instanceof Error ? err.message : 'unknown'}`
+        );
       }
     }
     this.clearAuthCookies(res);
@@ -174,7 +192,10 @@ export class AuthController {
   @ApiOperation({ summary: 'Exchange one-time code for tokens' })
   @ApiResponse({ status: 200, description: 'Tokens exchanged successfully' })
   @ApiResponse({ status: 401, description: 'Invalid or expired code' })
-  async exchangeGoogleCode(@Body() dto: ExchangeCodeDto, @Res({ passthrough: true }) res: Response) {
+  async exchangeGoogleCode(
+    @Body() dto: ExchangeCodeDto,
+    @Res({ passthrough: true }) res: Response
+  ) {
     const result = await this.auth.exchangeGoogleCode(dto.code);
     this.setAuthCookies(res, result.refreshToken, result.accessToken, result.expiresIn);
     return { accessToken: result.accessToken, expiresIn: result.expiresIn, user: result.user };
@@ -184,7 +205,12 @@ export class AuthController {
     return this.config.get<string>('NODE_ENV') === 'production';
   }
 
-  private setAuthCookies(res: Response, refreshToken: string, accessToken: string, expiresInSeconds: number): void {
+  private setAuthCookies(
+    res: Response,
+    refreshToken: string,
+    accessToken: string,
+    expiresInSeconds: number
+  ): void {
     const maxAge = 30 * 24 * 60 * 60 * 1000;
     res.cookie('af_rt', refreshToken, {
       httpOnly: true,
@@ -222,4 +248,3 @@ export class AuthController {
     res.clearCookie('af_sid', { ...base, httpOnly: false });
   }
 }
-

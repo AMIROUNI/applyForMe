@@ -1,7 +1,8 @@
 import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User, UserDocument } from './user.schema';
+import type { Model } from 'mongoose';
+import type { UserDocument } from './user.schema';
+import { User } from './user.schema';
 import * as argon2 from 'argon2';
 
 @Injectable()
@@ -29,10 +30,12 @@ export class UsersService {
     return this.userModel.findOne({ googleId }).exec();
   }
 
-  async linkGoogleId(userId: string, googleId: string, avatar?: string): Promise<UserDocument | null> {
-    return this.userModel
-      .findByIdAndUpdate(userId, { googleId, avatar }, { new: true })
-      .exec();
+  async linkGoogleId(
+    userId: string,
+    googleId: string,
+    avatar?: string
+  ): Promise<UserDocument | null> {
+    return this.userModel.findByIdAndUpdate(userId, { googleId, avatar }, { new: true }).exec();
   }
 
   async updatePassword(userId: string, passwordHash: string): Promise<void> {

@@ -1,4 +1,9 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, APP_INITIALIZER } from '@angular/core';
+import type { ApplicationConfig } from '@angular/core';
+import {
+  provideBrowserGlobalErrorListeners,
+  provideZoneChangeDetection,
+  APP_INITIALIZER,
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { I18nService } from './core/i18n/i18n.service';
@@ -25,7 +30,7 @@ export const appConfig: ApplicationConfig = {
       provide: APP_INITIALIZER,
       useFactory: initializeI18n,
       deps: [I18nService],
-      multi: true
-    }
-  ]
+      multi: true,
+    },
+  ],
 };

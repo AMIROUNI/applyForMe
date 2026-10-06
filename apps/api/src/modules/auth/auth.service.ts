@@ -1,11 +1,11 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { UsersService } from '../users/users.service';
-import { UserDocument } from '../users/user.schema';
-import { TokenService } from './token.service';
-import { GoogleService } from './google.service';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
+import type { ConfigService } from '@nestjs/config';
+import type { UsersService } from '../users/users.service';
+import type { UserDocument } from '../users/user.schema';
+import type { TokenService } from './token.service';
+import type { GoogleService } from './google.service';
+import type { RegisterDto } from './dto/register.dto';
+import type { LoginDto } from './dto/login.dto';
 
 export interface AuthResult {
   accessToken: string;
@@ -20,7 +20,7 @@ export class AuthService {
     private readonly config: ConfigService,
     private readonly users: UsersService,
     private readonly tokens: TokenService,
-    private readonly google: GoogleService,
+    private readonly google: GoogleService
   ) {}
 
   get webOrigin(): string {
@@ -37,7 +37,10 @@ export class AuthService {
     const user = await this.users.findByEmail(dto.email);
     if (!user || !user.passwordHash || !(await this.users.validatePassword(user, dto.password))) {
       await this.fakeDelay();
-      throw new UnauthorizedException({ code: 'INVALID_CREDENTIALS', message: 'Invalid credentials' });
+      throw new UnauthorizedException({
+        code: 'INVALID_CREDENTIALS',
+        message: 'Invalid credentials',
+      });
     }
     return this.issueTokens(user);
   }
@@ -45,7 +48,10 @@ export class AuthService {
   async refresh(refreshToken: string): Promise<AuthResult> {
     const result = await this.tokens.rotateRefreshToken(refreshToken);
     if (!result) {
-      throw new UnauthorizedException({ code: 'INVALID_REFRESH_TOKEN', message: 'Invalid or expired refresh token' });
+      throw new UnauthorizedException({
+        code: 'INVALID_REFRESH_TOKEN',
+        message: 'Invalid or expired refresh token',
+      });
     }
     const user = await this.users.findById(result.userId);
     if (!user) {
@@ -81,7 +87,10 @@ export class AuthService {
   async googleCallback(code: string, codeVerifier?: string): Promise<{ redirectUrl: string }> {
     const profile = await this.google.exchangeCodeForProfile(code, codeVerifier);
     if (!profile.emailVerified) {
-      throw new UnauthorizedException({ code: 'EMAIL_NOT_VERIFIED', message: 'Google email not verified' });
+      throw new UnauthorizedException({
+        code: 'EMAIL_NOT_VERIFIED',
+        message: 'Google email not verified',
+      });
     }
     const { user } = await this.google.findOrCreateUser(profile);
     const exchangeCode = await this.google.createExchangeCode(user._id.toString());
@@ -91,7 +100,10 @@ export class AuthService {
   async exchangeGoogleCode(code: string): Promise<AuthResult> {
     const consumed = await this.google.consumeExchangeCode(code);
     if (!consumed) {
-      throw new UnauthorizedException({ code: 'INVALID_EXCHANGE_CODE', message: 'Invalid or expired exchange code' });
+      throw new UnauthorizedException({
+        code: 'INVALID_EXCHANGE_CODE',
+        message: 'Invalid or expired exchange code',
+      });
     }
     const { token: refreshToken, familyId } = await this.tokens.mintRefreshToken(consumed.userId);
     const accessToken = this.tokens.generateAccessToken(consumed.userId, familyId);
@@ -134,6 +146,6 @@ export class AuthService {
   }
 
   private async fakeDelay(): Promise<void> {
-    await new Promise((r) => setTimeout(r, 100));
+    await new Promise(r => setTimeout(r, 100));
   }
 }

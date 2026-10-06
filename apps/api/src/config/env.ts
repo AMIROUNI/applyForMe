@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { validateEnv, EnvConfig } from './configuration';
+import type { EnvConfig } from './configuration';
+import { validateEnv } from './configuration';
 
 export type { EnvConfig } from './configuration';
 

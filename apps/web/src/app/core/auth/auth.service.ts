@@ -1,6 +1,8 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, catchError, finalize, map, of, shareReplay, throwError, tap } from 'rxjs';
+import type { HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
+import type { Observable } from 'rxjs';
+import { catchError, finalize, map, of, shareReplay, throwError, tap } from 'rxjs';
 import { I18nService } from '../i18n/i18n.service';
 
 export interface AuthUser {
@@ -135,7 +137,9 @@ export class AuthService {
       case 'VALIDATION_ERROR':
         return typeof body?.message === 'string' ? body.message : fallback;
       default:
-        return typeof body?.message === 'string' && body.message.length < 200 ? body.message : fallback;
+        return typeof body?.message === 'string' && body.message.length < 200
+          ? body.message
+          : fallback;
     }
   }
 

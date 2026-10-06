@@ -15,7 +15,10 @@ export const envSchema = z.object({
   JWT_REFRESH_TTL: z.string().default('30d'),
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
-  GOOGLE_CALLBACK_URL: z.string().url().default('http://localhost:3000/api/v1/auth/google/callback'),
+  GOOGLE_CALLBACK_URL: z
+    .string()
+    .url()
+    .default('http://localhost:3000/api/v1/auth/google/callback'),
   AUTH_RATE_LIMIT: z.string().default('5/60000'),
   ENCRYPTION_KEY: z.string().min(32, 'ENCRYPTION_KEY must be at least 32 characters (base64)'),
   GROQ_API_KEY: z.string().optional(),

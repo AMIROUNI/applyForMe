@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
+import type { ConfigService } from '@nestjs/config';
+import type { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import type { Model } from 'mongoose';
 import * as crypto from 'crypto';
 
 export interface RefreshTokenDoc {
@@ -25,7 +25,7 @@ export class TokenService {
   constructor(
     private readonly config: ConfigService,
     private readonly jwt: JwtService,
-    @InjectModel('RefreshToken') private readonly refreshTokenModel: Model<RefreshTokenDoc>,
+    @InjectModel('RefreshToken') private readonly refreshTokenModel: Model<RefreshTokenDoc>
   ) {}
 
   generateAccessToken(userId: string, sessionId: string): string {
@@ -36,7 +36,7 @@ export class TokenService {
         expiresIn: this.config.get<string>('JWT_ACCESS_TTL') ?? '15m',
         issuer: 'agency-apply',
         audience: 'agency-apply-web',
-      },
+      }
     );
   }
 
@@ -64,7 +64,10 @@ export class TokenService {
     return days * 24 * 60 * 60 * 1000;
   }
 
-  async mintRefreshToken(userId: string, familyId?: string): Promise<{ token: string; familyId: string }> {
+  async mintRefreshToken(
+    userId: string,
+    familyId?: string
+  ): Promise<{ token: string; familyId: string }> {
     const token = crypto.randomBytes(32).toString('base64url');
     const tokenHash = this.hashToken(token);
     const family = familyId ?? crypto.randomBytes(16).toString('hex');
@@ -80,7 +83,9 @@ export class TokenService {
     return { token, familyId: family };
   }
 
-  async rotateRefreshToken(presentedToken: string): Promise<{ userId: string; accessToken: string; refreshToken: string } | null> {
+  async rotateRefreshToken(
+    presentedToken: string
+  ): Promise<{ userId: string; accessToken: string; refreshToken: string } | null> {
     const presentedHash = this.hashToken(presentedToken);
     const stored = await this.refreshTokenModel.findOne({ tokenHash: presentedHash }).exec();
 

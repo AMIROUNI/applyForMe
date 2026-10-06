@@ -1,10 +1,15 @@
-import { Injectable, Logger, UnauthorizedException, InternalServerErrorException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import {
+  Injectable,
+  Logger,
+  UnauthorizedException,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import type { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { UsersService } from '../users/users.service';
-import { UserDocument } from '../users/user.schema';
+import type { Model } from 'mongoose';
+import type { UsersService } from '../users/users.service';
+import type { UserDocument } from '../users/user.schema';
 
 export interface GoogleProfile {
   id: string;
@@ -30,7 +35,7 @@ export class GoogleService {
   constructor(
     private config: ConfigService,
     private users: UsersService,
-    @InjectModel('OAuthCode') oauthCodeModel: Model<OAuthCodeDoc>,
+    @InjectModel('OAuthCode') oauthCodeModel: Model<OAuthCodeDoc>
   ) {
     this.oauthCodeModel = oauthCodeModel;
   }
@@ -82,12 +87,18 @@ export class GoogleService {
     });
 
     if (!res.ok) {
-      throw new UnauthorizedException({ code: 'GOOGLE_CODE_EXCHANGE_FAILED', message: 'Failed to exchange Google code' });
+      throw new UnauthorizedException({
+        code: 'GOOGLE_CODE_EXCHANGE_FAILED',
+        message: 'Failed to exchange Google code',
+      });
     }
 
     const { access_token } = (await res.json()) as { access_token?: string };
     if (!access_token) {
-      throw new UnauthorizedException({ code: 'GOOGLE_CODE_EXCHANGE_FAILED', message: 'Failed to exchange Google code' });
+      throw new UnauthorizedException({
+        code: 'GOOGLE_CODE_EXCHANGE_FAILED',
+        message: 'Failed to exchange Google code',
+      });
     }
 
     const profileRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
@@ -95,14 +106,20 @@ export class GoogleService {
     });
 
     if (!profileRes.ok) {
-      throw new UnauthorizedException({ code: 'GOOGLE_PROFILE_FETCH_FAILED', message: 'Failed to fetch Google profile' });
+      throw new UnauthorizedException({
+        code: 'GOOGLE_PROFILE_FETCH_FAILED',
+        message: 'Failed to fetch Google profile',
+      });
     }
 
     const raw = (await profileRes.json()) as Record<string, unknown>;
     const id = raw['sub'] ?? raw['id'];
     const email = raw['email'];
     if (typeof id !== 'string' || typeof email !== 'string' || !id || !email) {
-      throw new UnauthorizedException({ code: 'GOOGLE_PROFILE_FETCH_FAILED', message: 'Failed to fetch Google profile' });
+      throw new UnauthorizedException({
+        code: 'GOOGLE_PROFILE_FETCH_FAILED',
+        message: 'Failed to fetch Google profile',
+      });
     }
 
     // Google's OIDC userinfo (v3) returns `email_verified`; the legacy v2

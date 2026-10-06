@@ -15,7 +15,7 @@ async function bootstrap(): Promise<void> {
   const prefix = config.get<string>('API_PREFIX') ?? 'api/v1';
   const corsOrigins = (config.get<string>('CORS_ORIGINS') ?? 'http://localhost:4200')
     .split(',')
-    .map((o) => o.trim())
+    .map(o => o.trim())
     .filter(Boolean);
 
   app.use(helmet());
@@ -39,7 +39,7 @@ async function bootstrap(): Promise<void> {
       forbidNonWhitelisted: true,
       transform: true,
       transformOptions: { enableImplicitConversion: true },
-    }),
+    })
   );
 
   app.useGlobalFilters(new HttpExceptionFilter());
@@ -48,7 +48,7 @@ async function bootstrap(): Promise<void> {
   console.log(`API running on http://localhost:${port}/${prefix}`);
 }
 
-bootstrap().catch((err) => {
+bootstrap().catch(err => {
   console.error('Failed to start API:', err instanceof Error ? err.message : err);
   process.exit(1);
 });

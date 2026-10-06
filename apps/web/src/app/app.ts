@@ -8,7 +8,7 @@ import { AuthService } from './core/auth/auth.service';
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet],
-  templateUrl: './app.html'
+  templateUrl: './app.html',
 })
 export class App {
   private platformId = inject(PLATFORM_ID);

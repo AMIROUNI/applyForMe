@@ -20,7 +20,7 @@ const RefreshTokenSchema = new Schema(
     rotated: { type: Boolean, required: true, default: false },
     expiresAt: { type: Date, required: true, index: { expireAfterSeconds: 0 } },
   },
-  { timestamps: true, collection: 'refresh_tokens' },
+  { timestamps: true, collection: 'refresh_tokens' }
 );
 
 const OAuthCodeSchema = new Schema(
@@ -29,7 +29,7 @@ const OAuthCodeSchema = new Schema(
     userId: { type: String, required: true, index: true },
     expiresAt: { type: Date, required: true, index: { expireAfterSeconds: 0 } },
   },
-  { timestamps: true, collection: 'oauth_codes' },
+  { timestamps: true, collection: 'oauth_codes' }
 );
 
 const AuthAttemptSchema = new Schema(
@@ -38,7 +38,7 @@ const AuthAttemptSchema = new Schema(
     count: { type: Number, required: true, default: 1 },
     resetAt: { type: Date, required: true, index: { expireAfterSeconds: 0 } },
   },
-  { timestamps: true, collection: 'auth_attempts' },
+  { timestamps: true, collection: 'auth_attempts' }
 );
 
 @Module({
