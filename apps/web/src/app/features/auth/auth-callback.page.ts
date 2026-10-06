@@ -14,7 +14,7 @@ import { AUTH_PAGE_STYLES } from './auth.styles';
     <main class="auth-page">
       <section class="auth-card">
         <a href="/" class="auth-card__logo" aria-label="ApplyForME home">
-          <img [src]="logoSrc()" alt="" class="auth-card__logo-img" width="160" height="40">
+          <img [src]="logoSrc()" alt="" class="auth-card__logo-img" width="160" height="40" />
         </a>
 
         <div class="auth-status">
@@ -53,7 +53,7 @@ export class AuthCallbackPageComponent {
         return;
       }
       this.auth.exchangeGoogleCode(code).subscribe({
-        next: () => this.router.navigateByUrl('/', { replaceUrl: true }),
+        next: () => this.router.navigateByUrl('/dashboard', { replaceUrl: true }),
         error: () => this.fail(),
       });
     });
@@ -62,7 +62,10 @@ export class AuthCallbackPageComponent {
   private fail(): void {
     this.failed.set(true);
     setTimeout(() => {
-      this.router.navigate(['/login'], { queryParams: { error: 'oauth_failed' }, replaceUrl: true });
+      this.router.navigate(['/login'], {
+        queryParams: { error: 'oauth_failed' },
+        replaceUrl: true,
+      });
     }, 1500);
   }
 }

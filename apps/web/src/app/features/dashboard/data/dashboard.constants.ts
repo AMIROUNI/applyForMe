@@ -1,0 +1,45 @@
+import type { DatePosted, ExperienceLevel, JobStatus, JobType, RemoteType } from '@shared';
+import type { MultiSelectOption } from '../../../shared/ui/multi-select/multi-select.component';
+
+export interface LabelledOption extends MultiSelectOption {
+  labelKey: string;
+}
+
+export const COUNTRY_OPTIONS: LabelledOption[] = [
+  { value: 'tn', label: 'Tunisia', labelKey: 'country.tn' },
+  { value: 'fr', label: 'France', labelKey: 'country.fr' },
+  { value: 'ma', label: 'Morocco', labelKey: 'country.ma' },
+  { value: 'dz', label: 'Algeria', labelKey: 'country.dz' },
+  { value: 'us', label: 'United States', labelKey: 'country.us' },
+  { value: 'gb', label: 'United Kingdom', labelKey: 'country.gb' },
+  { value: 'de', label: 'Germany', labelKey: 'country.de' },
+  { value: 'ca', label: 'Canada', labelKey: 'country.ca' },
+  { value: 'ae', label: 'United Arab Emirates', labelKey: 'country.ae' },
+];
+
+export const STATUS_OPTIONS: LabelledOption[] = (
+  ['new', 'saved', 'applied', 'skipped'] as JobStatus[]
+).map((value) => ({ value, label: value, labelKey: `filters.status.${value}` }));
+
+export const EXPERIENCE_OPTIONS: LabelledOption[] = (
+  ['entry', 'mid', 'senior', 'lead', 'executive'] as ExperienceLevel[]
+).map((value) => ({ value, label: value, labelKey: `filters.experience.${value}` }));
+
+export const REMOTE_OPTIONS: LabelledOption[] = (
+  ['remote', 'hybrid', 'onsite'] as RemoteType[]
+).map((value) => ({ value, label: value, labelKey: `filters.remote.${value}` }));
+
+export const JOB_TYPE_OPTIONS: LabelledOption[] = (
+  ['full-time', 'part-time', 'contract', 'internship'] as JobType[]
+).map((value) => ({ value, label: value, labelKey: `filters.jobType.${value}` }));
+
+export const DATE_POSTED_OPTIONS: LabelledOption[] = (
+  ['last-24h', 'last-week', 'last-month', 'last-3-months', 'all'] as DatePosted[]
+).map((value) => ({ value, label: value, labelKey: `filters.datePosted.${value}` }));
+
+export const MIN_SCORE_OPTIONS: LabelledOption[] = [
+  { value: '', label: 'Any score', labelKey: 'filters.minScore.any' },
+  { value: '50', label: '50+', labelKey: 'filters.minScore.50' },
+  { value: '70', label: '70+', labelKey: 'filters.minScore.70' },
+  { value: '85', label: '85+', labelKey: 'filters.minScore.85' },
+];
