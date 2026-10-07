@@ -37,7 +37,7 @@ export interface ResolveResult {
   rejected: Array<{ source: string; reason: string }>;
 }
 
-const slugify = (value: string): string =>
+export const slugify = (value: string): string =>
   value
     .toLowerCase()
     .normalize('NFKD')

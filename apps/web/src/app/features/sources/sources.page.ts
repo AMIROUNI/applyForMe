@@ -13,6 +13,7 @@ import { ProviderKeysService } from './data/provider-keys.service';
 import { COUNTRY_OPTIONS } from '../dashboard/data/dashboard.constants';
 import type {
   CreateSource,
+  DiscoverResult,
   JobSource,
   ProviderKeyInfo,
   SourceType,
@@ -91,6 +92,15 @@ interface SourceGroup {
           </div>
         }
 
+        @if (discoveryError(); as discoverErr) {
+          <div class="sources__alert" role="alert">
+            <span>{{ discoverErr }}</span>
+            <button type="button" class="sources__retry" (click)="discoveryError.set(null)">
+              {{ t()['sources.dismiss'] }}
+            </button>
+          </div>
+        }
+
         <div class="sources__toolbar">
           <div
             class="sources__chips"
@@ -145,6 +155,17 @@ interface SourceGroup {
               </button>
             }
           </div>
+
+          <app-button
+            variant="secondary"
+            size="compact"
+            [loading]="discovering()"
+            [disabled]="!discoverCountry()"
+            [attr.title]="t()['sources.discoverNeedCountry']"
+            (clicked)="runDiscovery()"
+          >
+            {{ t()['sources.discover'] }}
+          </app-button>
 
           <app-button
             variant="primary"
@@ -448,7 +469,70 @@ interface SourceGroup {
             }
 
             <div class="sources__modal-actions">
-              <app-button variant="secondary" (clicked)="preview.set(null)">
+              <app-button variant="secondary" (click)="preview.set(null)">
+                {{ t()['sources.close'] }}
+              </app-button>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (discovery(); as result) {
+        <div class="sources__overlay" (click)="discovery.set(null)">
+          <div
+            class="sources__modal"
+            role="dialog"
+            aria-modal="true"
+            [attr.aria-label]="t()['sources.discoverTitle']"
+            (click)="$event.stopPropagation()"
+          >
+            <header class="sources__modal-head">
+              <div>
+                <h2 class="sources__modal-title">{{ t()['sources.discoverTitle'] }}</h2>
+                <app-badge [tone]="discoveryPassed(result) > 0 ? 'success' : 'warning'">
+                  {{ discoveryPassed(result) }} / {{ result.candidates.length }}
+                </app-badge>
+              </div>
+              <button
+                type="button"
+                class="sources__notice-close"
+                [attr.aria-label]="t()['sources.close']"
+                (click)="discovery.set(null)"
+              >
+                <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                  <path
+                    d="M4 4l8 8M12 4l-8 8"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    fill="none"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </button>
+            </header>
+
+            <p class="sources__modal-message">{{ discoverySummary(result) }}</p>
+
+            @if (result.candidates.length === 0) {
+              <p class="sources__modal-empty">{{ t()['sources.discoverEmpty'] }}</p>
+            } @else {
+              <ul class="sources__preview">
+                @for (candidate of result.candidates; track candidate.baseUrl) {
+                  <li>
+                    <a [href]="candidate.baseUrl" target="_blank" rel="noopener noreferrer">
+                      {{ candidate.name }}
+                    </a>
+                    <span>{{ typeLabel(candidate.type) }} · {{ candidate.reason }}</span>
+                    @for (job of candidate.preview; track job.url) {
+                      <span>{{ job.title }} · {{ job.company }}</span>
+                    }
+                  </li>
+                }
+              </ul>
+            }
+
+            <div class="sources__modal-actions">
+              <app-button variant="secondary" (clicked)="discovery.set(null)">
                 {{ t()['sources.close'] }}
               </app-button>
             </div>
@@ -941,6 +1025,10 @@ export class SourcesPageComponent implements OnInit {
   readonly preview = signal<SourceValidateResult | null>(null);
   readonly notice = signal<string | null>(null);
 
+  readonly discovering = signal(false);
+  readonly discovery = signal<DiscoverResult | null>(null);
+  readonly discoveryError = signal<string | null>(null);
+
   readonly apify = signal<ProviderKeyInfo | null>(null);
   readonly apifyTokenDraft = signal('');
   readonly apifyBusy = signal(false);
@@ -1023,6 +1111,12 @@ export class SourcesPageComponent implements OnInit {
     () => this.formName().trim().length >= 2 && /^https?:\/\/.+/i.test(this.formBaseUrl().trim()),
   );
 
+  /** Discovery needs a concrete 2-letter country; '' (all) and '*' are invalid. */
+  readonly discoverCountry = computed(() => {
+    const filter = this.countryFilter();
+    return /^[a-z]{2}$/.test(filter) ? filter : null;
+  });
+
   ngOnInit(): void {
     this.load();
     this.loadKeys();
@@ -1104,6 +1198,35 @@ export class SourcesPageComponent implements OnInit {
         this.formError.set(this.t()['sources.validateFail']);
       },
     });
+  }
+
+  runDiscovery(): void {
+    const country = this.discoverCountry();
+    if (!country || this.discovering()) return;
+    this.discovering.set(true);
+    this.discoveryError.set(null);
+    this.discovery.set(null);
+    this.sourcesService.discover(country).subscribe({
+      next: (result) => {
+        this.discovering.set(false);
+        this.discovery.set(result);
+        this.load();
+      },
+      error: (err) => {
+        this.discovering.set(false);
+        this.discoveryError.set(err?.error?.message ?? this.t()['sources.discoverFail']);
+      },
+    });
+  }
+
+  discoveryPassed(result: DiscoverResult): number {
+    return result.candidates.filter((candidate) => candidate.ok).length;
+  }
+
+  discoverySummary(result: DiscoverResult): string {
+    return this.t()
+      ['sources.discoverSummary'].replace('{passed}', String(this.discoveryPassed(result)))
+      .replace('{total}', String(result.candidates.length));
   }
 
   submitForm(): void {

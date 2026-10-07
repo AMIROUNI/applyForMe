@@ -25,7 +25,10 @@ const system = (source: Omit<SeedSource, 'addedBy'>): SeedSource => ({
  * activate through `POST /sources/:id/validate` as soon as their adapter
  * returns enough jobs - generic html/rss/api adapters (Phase 2) cover most of
  * them, the Apify connector (Phase 3) runs the `apify` types once the user
- * connects their token, and Phase 4 still owes `ai_extract`.
+ * connects their token, and AI discovery (Phase 4) adds country-specific
+ * `pending` sources through `POST /sources/discover` (`ai_extract` itself
+ * stays unsupported by design - the model only proposes, deterministic
+ * adapters scrape).
  */
 export const SOURCE_SEED: SeedSource[] = [
   // ---- Active: existing bespoke adapters --------------------------------

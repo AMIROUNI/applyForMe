@@ -308,6 +308,12 @@ export const frTranslations: Record<string, string> = {
   'sources.health.never': 'Pas encore exécutée',
   'sources.health.failures': 'échec(s)',
   'sources.created': 'Source ajoutée — elle reste en attente jusqu’à validation.',
+  'sources.discover': 'Trouver des sources',
+  'sources.discoverNeedCountry': 'Choisissez d’abord un pays',
+  'sources.discoverTitle': 'Découverte de sources par IA',
+  'sources.discoverSummary': '{passed} sur {total} candidats validés — ajoutés en attente.',
+  'sources.discoverEmpty': 'Le modèle n’a proposé aucune source pour ce pays.',
+  'sources.discoverFail': 'La découverte de sources par IA a échoué.',
   'sources.addTitle': 'Ajouter une source personnalisée',
   'sources.form.hint':
     'Les nouvelles sources démarrent en attente. Validez-les pour les inclure dans les runs.',

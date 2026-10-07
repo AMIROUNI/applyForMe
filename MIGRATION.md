@@ -32,6 +32,7 @@ All routes require a JWT (global `JwtAuthGuard`).
 | `POST /sources` | Create a custom source — starts as `pending`. |
 | `PATCH /sources/:id` | Update fields, including `status`. |
 | `POST /sources/:id/validate` | Dry run: fetches a preview, records health, and flips `pending` → `active` when ≥ 3 jobs come back. |
+| `POST /sources/discover` | AI proposes candidates for a country; only deterministically validated ones are added as `pending` (Phase 4). |
 
 Validation runs are SSRF-guarded (`url-guard.ts`): only `http(s)`, no private/loopback hosts, no redirects to them.
 
@@ -80,10 +81,29 @@ Consequences:
 - UI: Sources page gained an "Apify integration" card (paste token → verified → masked state → disconnect) and `needsKey` badges flip to "Apify connected"; the scraper sidebar enables connected+active Apify sources and drops the "(Connect Apify to enable)" suffix once connected. Strings added to `translations.en.ts` / `translations.fr.ts`.
 - `fetchText` now honors a caller-supplied `signal` (the Apify run's 90s budget) instead of always forcing 15s.
 
+## Phase 4 - AI source discovery
+
+Groq proposes candidate sources for a country; deterministic code validates every candidate and only stores the passing ones as `pending` sources. The LLM never produces final job data.
+
+| Piece | Where | What |
+|---|---|---|
+| Shared contracts | `discovery.dto.ts` | `discoverSourcesSchema` (`country` = 2-letter ISO code, `keywords` <= 5), `discoveryProposalSchema` (all the model may propose: name/baseUrl/type + optional selectors/feedUrls/endpoint), `discoverResultSchema` (per-candidate verdict + 3-job preview). |
+| LLM adapter | `sources/llm.service.ts` | Groq chat completions (`GROQ_BASE_URL`, `GROQ_MODEL`, JSON-object mode, 30s timeout); the key travels only in the `Authorization` header. Every proposal is re-validated with zod - invalid entries are dropped, <= 6 valid ones return. 503 `AI_DISCOVERY_UNCONFIGURED` without `GROQ_API_KEY`, 502 `AI_DISCOVERY_FAILED` / `AI_DISCOVERY_BAD_OUTPUT` on transport or unreadable output. |
+| Validator | `sources/discovery.service.ts` | SSRF guard on `baseUrl` and config URLs -> registry dedupe by origin -> adapter resolves -> robots.txt-aware scrape through the generic adapters -> >= 3 parseable jobs -> stored as `status: pending`, `addedBy: ai`, `ownerId: <caller>`, `countries: [country]`. 500 ms pause between candidates. |
+| Endpoint | `POST /sources/discover` | `{country, keywords?}` -> `{country, candidates: [{name, baseUrl, type, ok, reason, sourceId, sampleCount, preview[]}]}`. |
+
+Consequences:
+
+- `ai_extract` stays unsupported by design - discovery proposes `html`/`rss`/`api` sources that deterministic adapters scrape; `unavailableReason` now spells that out instead of promising a future phase.
+- Accepted candidates start `pending` and need `POST /sources/:id/validate` to activate, exactly like hand-added sources (`addedBy: ai` already existed in the schema).
+- Failing candidates are reported in the response (safe reason string) and never stored; unsafe URLs never reach the network; registry duplicates are reported with their existing id.
+- UI: Sources page gained a "Find sources" button (enabled only while a concrete 2-letter country filter is active) plus a results modal (verdict, reason, preview jobs) and a top alert for AI failures; strings added to `translations.en.ts` / `translations.fr.ts`.
+- Env: optional `GROQ_MODEL` (default `llama-3.3-70b-versatile`); discovery needs `GROQ_API_KEY` at call time and fails with a clear 503 when it is missing.
+
 ## No action required
 
-- No new environment variables.
-- No existing documents are modified (collection starts empty or auto-seed).
+- Only optional env: `GROQ_MODEL` has a default; discovery degrades to a clear 503 without `GROQ_API_KEY` (already in `.env.example`).
+- No existing documents are modified (collection starts empty or auto-seed; discovery only inserts new `pending` rows).
 - Old clients keep working: unknown fields are not required, and run/search contracts are untouched.
 
 ## Verification
@@ -91,7 +111,7 @@ Consequences:
 ```bash
 npm run build -w packages/shared
 npx tsc -p apps/api/tsconfig.build.json --noEmit
-npx jest --config apps/api/package.json --rootDir apps/api   # 62 tests
+npx jest --config apps/api/package.json --rootDir apps/api   # 92 tests
 npm run lint -w apps/api
 npm run build -w apps/web
 npm run lint -w apps/web

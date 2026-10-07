@@ -23,6 +23,7 @@ export const envSchema = z.object({
   ENCRYPTION_KEY: z.string().min(32, 'ENCRYPTION_KEY must be at least 32 characters (base64)'),
   GROQ_API_KEY: z.string().optional(),
   GROQ_BASE_URL: z.string().url().default('https://api.groq.com/openai/v1'),
+  GROQ_MODEL: z.string().min(1).default('llama-3.3-70b-versatile'),
 });
 
 export type EnvConfig = z.infer<typeof envSchema>;

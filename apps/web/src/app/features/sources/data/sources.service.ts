@@ -1,7 +1,13 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import type { Observable } from 'rxjs';
-import type { CreateSource, JobSource, SourceListQuery, SourceValidateResult } from '@shared';
+import type {
+  CreateSource,
+  DiscoverResult,
+  JobSource,
+  SourceListQuery,
+  SourceValidateResult,
+} from '@shared';
 
 const API = '/api/v1';
 
@@ -24,5 +30,10 @@ export class SourcesService {
 
   validate(id: string): Observable<SourceValidateResult> {
     return this.http.post<SourceValidateResult>(`${API}/sources/${id}/validate`, {});
+  }
+
+  /** AI source discovery: proposals are validated server-side, never trusted. */
+  discover(country: string, keywords: string[] = []): Observable<DiscoverResult> {
+    return this.http.post<DiscoverResult>(`${API}/sources/discover`, { country, keywords });
   }
 }

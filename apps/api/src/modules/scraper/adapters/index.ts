@@ -43,8 +43,10 @@ const bespoke: AdapterFactory = source =>
 
 /**
  * Generic factories keyed by registry `type`: `rss`/`html`/`api` since Phase 2,
- * `apify` since Phase 3 (needs the user's token in the context), Phase 4 adds
- * `ai_extract`. Returning `null` means "no adapter can run this source yet".
+ * `apify` since Phase 3 (needs the user's token in the context). `ai_extract`
+ * is intentionally `null` - Phase 4 design: the LLM only proposes candidates,
+ * deterministic adapters do the scraping. Returning `null` means "no adapter
+ * can run this source yet".
  */
 const FACTORIES: Record<SourceType, AdapterFactory> = {
   api: source => (source.config.endpoint ? createApiAdapter(source) : null),
@@ -84,7 +86,7 @@ export function unavailableReason(source: RegistrySource, ctx: AdapterContext = 
         ? 'Apify source has no connected account'
         : 'No Apify actor configured for this source';
     case 'ai_extract':
-      return 'AI extraction adapter is not available yet';
+      return 'AI extraction is not supported - AI discovery proposes sources, deterministic adapters scrape them';
     default:
       return 'No adapter available for this source';
   }

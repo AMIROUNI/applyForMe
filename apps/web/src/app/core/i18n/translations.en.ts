@@ -302,6 +302,13 @@ export const enTranslations: Record<string, string> = {
   'sources.health.never': 'Not run yet',
   'sources.health.failures': 'failure(s)',
   'sources.created': 'Source added — it stays pending until it passes validation.',
+  'sources.discover': 'Find sources',
+  'sources.discoverNeedCountry': 'Pick a country first',
+  'sources.discoverTitle': 'AI source discovery',
+  'sources.discoverSummary':
+    '{passed} of {total} candidates passed validation and were added as pending.',
+  'sources.discoverEmpty': 'The model proposed no sources for this country.',
+  'sources.discoverFail': 'AI source discovery failed.',
   'sources.addTitle': 'Add a custom source',
   'sources.form.hint': 'New sources start as pending. Validate them to allow them in runs.',
   'sources.form.name': 'Name',
