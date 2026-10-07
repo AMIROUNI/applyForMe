@@ -1,0 +1,30 @@
+{
+  "jobs": [
+    {
+      "id": 1001,
+      "url": "https://www.remotive.com/remote-jobs/1001",
+      "title": "Senior React Developer",
+      "company_name": "Acme Corp",
+      "category": "Software Development",
+      "tags": ["react", "typescript", "node"],
+      "job_type": "Full-time",
+      "publication_date": "2026-10-01T10:00:00",
+      "candidate_required_location": "Worldwide",
+      "salary": "$80k - $110k",
+      "description": "<p>Build <strong>React</strong> applications with TypeScript and Node.js.</p>"
+    },
+    {
+      "id": 1002,
+      "url": "https://www.remotive.com/remote-jobs/1002",
+      "title": "UX Designer",
+      "company_name": "Design Studio",
+      "category": "Design",
+      "tags": ["figma", "design"],
+      "job_type": "Contract",
+      "publication_date": "2026-09-28T09:00:00",
+      "candidate_required_location": "Tunisia",
+      "salary": "",
+      "description": "Design beautiful interfaces with Figma."
+    }
+  ]
+}

@@ -43,6 +43,13 @@ import { ButtonComponent } from '../../shared/ui/button/button.component';
           >
             {{ t()['nav.dashboard'] }}
           </a>
+          <a
+            routerLink="/sources"
+            class="app-header__link"
+            routerLinkActive="app-header__link--active"
+          >
+            {{ t()['nav.sources'] }}
+          </a>
         </nav>
 
         <div class="app-header__actions">

@@ -9,6 +9,7 @@ import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { ScraperModule } from './modules/scraper/scraper.module';
+import { SourcesModule } from './modules/sources/sources.module';
 import { HealthController } from './health.controller';
 import envConfig, { findEnvFile } from './config/env';
 
@@ -37,6 +38,7 @@ import envConfig, { findEnvFile } from './config/env';
     AuthModule,
     JobsModule,
     ScraperModule,
+    SourcesModule,
   ],
   controllers: [HealthController],
   providers: [

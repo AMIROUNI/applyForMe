@@ -18,7 +18,6 @@ export class AuthRateLimitGuard implements CanActivate {
   private readonly attemptModel: Model<AuthAttemptDoc>;
   private readonly limit: number;
   private readonly windowMs: number;
-
   constructor(
     config: ConfigService,
     private reflector: Reflector,

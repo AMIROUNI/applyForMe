@@ -1,0 +1,29 @@
+{
+  "data": [
+    {
+      "slug": "frontend-developer-abc123",
+      "company_name": "WebAgency",
+      "title": "Frontend Developer (m/f/d)",
+      "description": "<h1>Frontend Developer</h1><p>React, TypeScript, CSS.</p>",
+      "remote": false,
+      "url": "https://www.arbeitnow.com/job/frontend-developer-abc123",
+      "tags": ["React", "TypeScript"],
+      "job_types": ["full_time"],
+      "location": "Berlin, Germany",
+      "created_at": 1759340400
+    },
+    {
+      "slug": "junior-node-dev-def456",
+      "company_name": "Startup GmbH",
+      "title": "Junior Node Developer",
+      "description": "<p>Entry level Node.js role.</p>",
+      "remote": true,
+      "url": "https://www.arbeitnow.com/job/junior-node-dev-def456",
+      "tags": ["NodeJS"],
+      "job_types": ["part_time"],
+      "location": "",
+      "created_at": 1759254000
+    }
+  ],
+  "links": { "next": "https://www.arbeitnow.com/api/job-board-api?page=2" }
+}

@@ -1,0 +1,31 @@
+[
+  {
+    "legal": "Listing is provided as a free service..."
+  },
+  {
+    "id": 9001,
+    "slug": "senior-react-developer-at-acme-9001",
+    "epoch": 1759340400,
+    "date": "2026-10-01T12:00:00",
+    "company": "Acme Corp",
+    "position": "Senior React Developer",
+    "tags": ["react", "senior", "typescript"],
+    "description": "<p>We are hiring a React developer.</p>",
+    "location": "Worldwide",
+    "salary_min": 80000,
+    "salary_max": 110000,
+    "url": "https://remoteok.com/l/9001"
+  },
+  {
+    "id": 9002,
+    "slug": "python-engineer-9002",
+    "epoch": 1759254000,
+    "date": "2026-09-30T12:00:00",
+    "company": "DataCo",
+    "position": "Python Engineer",
+    "tags": ["python", "django"],
+    "description": "<p>Python and Django backend work.</p>",
+    "location": "Tunisia",
+    "url": "https://remoteok.com/l/9002"
+  }
+]

@@ -17,6 +17,13 @@ export const routes: Routes = [
     title: 'Dashboard — ApplyForME',
   },
   {
+    path: 'sources',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/sources/sources.page').then((m) => m.SourcesPageComponent),
+    title: 'Sources — ApplyForME',
+  },
+  {
     path: 'login',
     loadComponent: () => import('./features/auth/login.page').then((m) => m.LoginPageComponent),
     title: 'Log in — ApplyForME',
