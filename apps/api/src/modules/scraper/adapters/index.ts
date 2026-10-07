@@ -1,9 +1,14 @@
-import type { SourceConfig, SourceType } from '@agency-apply/shared';
-import type { SourceAdapter } from '../scraper.types';
+import type { SourceType } from '@agency-apply/shared';
+import type { RegistrySource, SourceAdapter } from '../scraper.types';
 import { remotiveScraper } from './remotive.adapter';
 import { remoteOkScraper } from './remoteok.adapter';
 import { arbeitnowScraper } from './arbeitnow.adapter';
 import { wwrScraper } from './weworkremotely.adapter';
+import { createRssAdapter } from './generic-rss.adapter';
+import { createHtmlAdapter } from './generic-html.adapter';
+import { createApiAdapter } from './generic-api.adapter';
+
+export type { RegistrySource } from '../scraper.types';
 
 export const SOURCE_ADAPTERS: SourceAdapter[] = [
   remotiveScraper,
@@ -26,15 +31,6 @@ export const UNSUPPORTED_SOURCES: Record<string, string> = {
 
 export const DEFAULT_SOURCES = SOURCE_ADAPTERS.map(adapter => adapter.id);
 
-/** A source as stored in the `job_sources` registry, reduced to what a resolver needs. */
-export interface RegistrySource {
-  id: string;
-  name: string;
-  type: SourceType;
-  config: SourceConfig;
-  requiresUserToken: boolean;
-}
-
 type AdapterFactory = (source: RegistrySource) => SourceAdapter | null;
 
 /**
@@ -45,14 +41,14 @@ const bespoke: AdapterFactory = source =>
   (source.config.adapterId && adapterById.get(source.config.adapterId)) || null;
 
 /**
- * Generic factories keyed by registry `type`. Each phase plugs its adapter in
- * here: Phase 2 `rss`/`html`, Phase 3 `apify`, Phase 4 `ai_extract`.
- * Returning `null` means "no adapter can run this source yet".
+ * Generic factories keyed by registry `type`. Phase 2 ships `rss`/`html`/`api`;
+ * Phase 3 plugs in `apify`, Phase 4 `ai_extract`. Returning `null` means
+ * "no adapter can run this source yet".
  */
 const FACTORIES: Record<SourceType, AdapterFactory> = {
-  api: () => null,
-  rss: () => null,
-  html: () => null,
+  api: source => (source.config.endpoint ? createApiAdapter(source) : null),
+  rss: source => createRssAdapter(source),
+  html: source => createHtmlAdapter(source),
   apify: () => null,
   ai_extract: () => null,
 };
@@ -71,13 +67,12 @@ export function unavailableReason(source: RegistrySource): string {
     return `Adapter "${source.config.adapterId}" is not registered`;
   }
   switch (source.type) {
+    case 'api':
+      return 'No API endpoint configured for this source';
     case 'apify':
       return 'Apify connector is not available yet';
     case 'ai_extract':
       return 'AI extraction adapter is not available yet';
-    case 'rss':
-    case 'html':
-      return 'Generic adapter for this source type is not available yet';
     default:
       return 'No adapter available for this source';
   }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>TechBoard Jobs</title>
+    <link>https://feed.example.com</link>
+    <description>Latest openings</description>
+    <item>
+      <title>Acme Corp: Senior Backend Engineer</title>
+      <link>/jobs/senior-backend-engineer</link>
+      <description><![CDATA[<p>Design APIs in Node.js and PostgreSQL.</p>]]></description>
+      <pubDate>Mon, 14 Sep 2026 09:00:00 GMT</pubDate>
+      <category>engineering</category>
+    </item>
+    <item>
+      <title>Data Analyst | Numbers Inc</title>
+      <link>https://feed.example.com/jobs/data-analyst</link>
+      <description>Build dashboards with SQL and Python.</description>
+      <pubDate>Tue, 15 Sep 2026 10:30:00 GMT</pubDate>
+      <category>analytics</category>
+    </item>
+    <item>
+      <title>Product Designer</title>
+      <link>https://feed.example.com/jobs/product-designer</link>
+      <description>Own the design system end to end.</description>
+      <pubDate>Wed, 16 Sep 2026 08:00:00 GMT</pubDate>
+      <category>design</category>
+    </item>
+  </channel>
+</rss>

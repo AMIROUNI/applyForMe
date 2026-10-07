@@ -1,4 +1,3 @@
-import { load } from 'cheerio';
 import { canFetch } from '../robots';
 import { fetchText } from '../http';
 import {
@@ -10,6 +9,7 @@ import {
   toJobType,
   toRemoteType,
 } from '../normalize';
+import { parseRss } from './rss';
 import type { NormalizedJob, ScrapeParams, SourceAdapter } from '../scraper.types';
 
 export const WWR_FEEDS = [
@@ -17,32 +17,6 @@ export const WWR_FEEDS = [
   'https://weworkremotely.com/categories/remote-front-end-programming-jobs.rss',
   'https://weworkremotely.com/categories/remote-back-end-programming-jobs.rss',
 ];
-
-interface RssItem {
-  title: string;
-  link: string;
-  description: string;
-  pubDate: string;
-  region: string;
-  category: string;
-}
-
-export function parseRss(xml: string): RssItem[] {
-  const $ = load(xml, { xmlMode: true });
-  return $('item')
-    .toArray()
-    .map(element => {
-      const item = $(element);
-      return {
-        title: item.find('title').first().text().trim(),
-        link: item.find('link').first().text().trim(),
-        description: item.find('description').first().text().trim(),
-        pubDate: item.find('pubDate').first().text().trim(),
-        region: item.find('region').first().text().trim(),
-        category: item.find('category').first().text().trim(),
-      };
-    });
-}
 
 const splitTitle = (raw: string): { company: string; title: string } => {
   const sep = raw.indexOf(':');

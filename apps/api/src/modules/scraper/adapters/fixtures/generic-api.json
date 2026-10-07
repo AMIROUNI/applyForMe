@@ -1,0 +1,27 @@
+{
+  "results": [
+    {
+      "title": "Platform Engineer",
+      "company": { "name": "Orbit Systems" },
+      "url": "/jobs/platform-engineer",
+      "location": "Remote - Canada",
+      "date": "2026-09-10",
+      "description": "Kubernetes and Terraform for a growing fintech."
+    },
+    {
+      "title": "QA Engineer",
+      "company": "Softworks",
+      "url": "https://api.example.com/jobs/qa-engineer",
+      "location": "Tunis, Tunisie",
+      "date": "2026-09-11",
+      "description": "Automate regressions across our web and mobile clients."
+    },
+    {
+      "title": "Growth Lead",
+      "company": "Metrica",
+      "location": "Paris, France",
+      "date": "2026-09-12",
+      "description": "Own acquisition loops for a B2B analytics product."
+    }
+  ]
+}

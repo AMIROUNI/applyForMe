@@ -1,3 +1,5 @@
+import type { SourceConfig, SourceType } from '@agency-apply/shared';
+
 export type RemoteType = 'onsite' | 'hybrid' | 'remote';
 export type JobType = 'all' | 'full-time' | 'part-time' | 'contract' | 'internship';
 export type ExperienceLevel = 'all' | 'entry' | 'mid' | 'senior' | 'lead' | 'executive';
@@ -30,4 +32,15 @@ export interface SourceAdapter {
   id: string;
   name: string;
   scrape(params: ScrapeParams): Promise<NormalizedJob[]>;
+}
+
+/** A source as stored in the `job_sources` registry, reduced to what a resolver/adapter needs. */
+export interface RegistrySource {
+  id: string;
+  name: string;
+  baseUrl: string;
+  type: SourceType;
+  remoteFriendly: boolean;
+  config: SourceConfig;
+  requiresUserToken: boolean;
 }

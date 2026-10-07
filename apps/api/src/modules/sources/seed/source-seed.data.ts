@@ -21,9 +21,11 @@ const system = (source: Omit<SeedSource, 'addedBy'>): SeedSource => ({
 });
 
 /**
- * Starter registry. `active` entries have a working adapter today; everything
- * else is `pending` until a generic adapter (Phase 2), the Apify connector
- * (Phase 3) or the AI discovery validator (Phase 4) can run it.
+ * Starter registry. `active` entries have a working adapter today; the rest
+ * activate through `POST /sources/:id/validate` as soon as their adapter
+ * returns enough jobs — generic html/rss/api adapters (Phase 2) cover most of
+ * them, the Apify connector (Phase 3) and the AI discovery validator
+ * (Phase 4) still owe the `apify` and `ai_extract` types.
  */
 export const SOURCE_SEED: SeedSource[] = [
   // ---- Active: existing bespoke adapters --------------------------------

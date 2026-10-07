@@ -25,7 +25,7 @@ import {
 } from '../scraper/adapters';
 import { SOURCE_SEED, type SeedSource } from './seed/source-seed.data';
 import { JobSource, emptyHealth, type JobSourceDocument } from './source.schema';
-import { assertSafeHttpUrl } from './url-guard';
+import { assertSafeHttpUrl, assertSafeSourceConfig } from './url-guard';
 
 const SAMPLE_SIZE = 3;
 const ACTIVATION_THRESHOLD = 3;
@@ -153,6 +153,7 @@ export class SourcesService implements OnModuleInit {
 
   async create(userId: string, dto: CreateSource): Promise<JobSourceDto> {
     assertSafeHttpUrl(dto.baseUrl);
+    assertSafeSourceConfig(dto.config);
     const id = await this.uniqueId(slugify(dto.name));
 
     const doc = await this.sourceModel.create({
@@ -186,6 +187,7 @@ export class SourcesService implements OnModuleInit {
     }
 
     if (dto.baseUrl !== undefined) assertSafeHttpUrl(dto.baseUrl);
+    if (dto.config !== undefined) assertSafeSourceConfig(dto.config);
     for (const key of [
       'name',
       'description',
@@ -217,6 +219,7 @@ export class SourcesService implements OnModuleInit {
 
     try {
       assertSafeHttpUrl(doc.baseUrl);
+      assertSafeSourceConfig(doc.config as Record<string, unknown> | null);
 
       if (!adapter) {
         await canFetch(doc.baseUrl);
@@ -299,7 +302,9 @@ export class SourcesService implements OnModuleInit {
       usable.push({
         id,
         name: adapter.name,
+        baseUrl: '',
         type: 'api',
+        remoteFriendly: true,
         config: { adapterId: id },
         requiresUserToken: false,
       });
@@ -364,7 +369,9 @@ export function toRegistry(doc: JobSourceDocument): RegistrySource {
   return {
     id: doc.id,
     name: doc.name,
+    baseUrl: doc.baseUrl,
     type: doc.type,
+    remoteFriendly: Boolean(doc.remoteFriendly),
     config: (doc.config ?? {}) as RegistrySource['config'],
     requiresUserToken: Boolean(doc.requiresUserToken),
   };

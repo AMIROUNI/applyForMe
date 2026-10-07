@@ -13,7 +13,9 @@ const runStart = (sources: string[]) => ({
 const registrySource = (id: string): RegistrySource => ({
   id,
   name: id,
+  baseUrl: '',
   type: 'api',
+  remoteFriendly: true,
   config: { adapterId: id },
   requiresUserToken: false,
 });

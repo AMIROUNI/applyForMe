@@ -162,7 +162,9 @@ describe('SourcesService', () => {
       {
         id: 'remotive',
         name: 'Remotive',
+        baseUrl: '',
         type: 'api',
+        remoteFriendly: true,
         config: { adapterId: 'remotive' },
         requiresUserToken: false,
       },
@@ -313,7 +315,7 @@ describe('SourcesService', () => {
 
   it('probes reachability without an adapter and keeps the source pending', async () => {
     await seedModel(model);
-    const row = model.rows.find(entry => entry.id === 'wuzzuf');
+    const row = model.rows.find(entry => entry.id === 'glassdoor');
     const baseUrl = String(row?.baseUrl);
     const originalFetch = global.fetch;
     global.fetch = jest.fn().mockResolvedValue({
@@ -322,7 +324,7 @@ describe('SourcesService', () => {
     }) as never;
 
     try {
-      const result = await service.validate('user-1', 'wuzzuf');
+      const result = await service.validate('user-1', 'glassdoor');
       expect(result).toMatchObject({
         ok: true,
         reachable: true,
@@ -330,11 +332,50 @@ describe('SourcesService', () => {
         sampleCount: 0,
         status: 'pending',
       });
-      expect(result.message).toContain('html');
+      expect(result.message).toContain('apify');
       expect(global.fetch).toHaveBeenCalledWith(
         expect.stringContaining(new URL(baseUrl).hostname),
         expect.anything()
       );
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
+
+  it('runs a pending html source through the generic adapter and activates it', async () => {
+    await seedModel(model);
+    const postings = Array.from({ length: 3 }, (_, index) => ({
+      '@type': 'JobPosting',
+      title: `Frontend Engineer ${index}`,
+      description: 'Build accessible dashboards with Angular.',
+      datePosted: '2026-10-01',
+      hiringOrganization: { '@type': 'Organization', name: `Studio ${index}` },
+      jobLocation: {
+        '@type': 'Place',
+        address: { '@type': 'PostalAddress', addressLocality: 'Paris', addressCountry: 'FR' },
+      },
+      url: `https://wuzzuf.net/jobs/frontend-engineer-${index}`,
+    }));
+    const page = `<html><head><script type="application/ld+json">${JSON.stringify(
+      postings
+    )}</script></head><body></body></html>`;
+
+    const originalFetch = global.fetch;
+    global.fetch = jest.fn(async (url: unknown) => ({
+      ok: true,
+      text: async () => (String(url).includes('robots.txt') ? '' : page),
+    })) as never;
+
+    try {
+      const result = await service.validate('user-1', 'wuzzuf');
+      expect(result).toMatchObject({
+        ok: true,
+        runnable: true,
+        sampleCount: 3,
+        status: 'active',
+      });
+      expect(result.preview.map(job => job.company)).toEqual(['Studio 0', 'Studio 1', 'Studio 2']);
+      expect(model.rows.find(row => row.id === 'wuzzuf')?.status).toBe('active');
     } finally {
       global.fetch = originalFetch;
     }

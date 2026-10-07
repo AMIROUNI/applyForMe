@@ -35,7 +35,7 @@ const isPrivateIpv4 = (host: string): boolean => PRIVATE_IPV4.some(pattern => pa
  * SSRF guard for user-supplied URLs: http(s) only, no localhost/private ranges.
  * Phase 8 hardens this with DNS resolution and redirect limits.
  */
-export function assertSafeHttpUrl(raw: string): URL {
+export function assertSafeHttpUrl(raw: string, path = 'baseUrl'): URL {
   let url: URL;
   try {
     url = new URL(raw);
@@ -44,7 +44,7 @@ export function assertSafeHttpUrl(raw: string): URL {
       statusCode: 400,
       code: 'INVALID_URL',
       message: 'Invalid URL',
-      details: [{ path: 'baseUrl', message: 'Must be a valid absolute URL' }],
+      details: [{ path, message: 'Must be a valid absolute URL' }],
     });
   }
 
@@ -63,7 +63,7 @@ export function assertSafeHttpUrl(raw: string): URL {
       message: 'This URL is not allowed',
       details: [
         {
-          path: 'baseUrl',
+          path,
           message: 'Only public http(s) addresses can be added as a source',
         },
       ],
@@ -79,5 +79,23 @@ export function isSafeHttpUrl(raw: string): boolean {
     return true;
   } catch {
     return false;
+  }
+}
+
+/** Guards every URL a generic adapter may fetch (`endpoint`, `feedUrls`, `sitemapUrl`). */
+export function assertSafeSourceConfig(config: Record<string, unknown> | null | undefined): void {
+  if (!config) return;
+
+  const candidates: Array<[string, unknown]> = [
+    ['config.endpoint', config['endpoint']],
+    ['config.sitemapUrl', config['sitemapUrl']],
+  ];
+  const feedUrls = config['feedUrls'];
+  if (Array.isArray(feedUrls)) {
+    feedUrls.forEach((value, index) => candidates.push([`config.feedUrls[${index}]`, value]));
+  }
+
+  for (const [path, value] of candidates) {
+    if (typeof value === 'string' && value.trim()) assertSafeHttpUrl(value, path);
   }
 }

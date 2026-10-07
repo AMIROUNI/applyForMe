@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Careers — Example Corp</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Acme Corp"
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "JobPosting",
+        "title": "Senior React Developer",
+        "description": "<p>Build our design system with React and TypeScript.</p>",
+        "datePosted": "2026-09-12",
+        "employmentType": "FULL_TIME",
+        "jobLocationType": "TELECOMMUTE",
+        "hiringOrganization": { "@type": "Organization", "name": "Acme Corp" },
+        "baseSalary": {
+          "@type": "MonetaryAmount",
+          "currency": "USD",
+          "value": {
+            "@type": "QuantitativeValue",
+            "minValue": 80000,
+            "maxValue": 110000,
+            "unitText": "YEAR"
+          }
+        },
+        "url": "https://jobs.example.com/acme/senior-react-developer"
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "JobPosting",
+            "title": "DevOps Engineer",
+            "description": "Run our Kubernetes platform across EU regions.",
+            "datePosted": "2026-09-20",
+            "employmentType": "CONTRACT",
+            "hiringOrganization": { "@type": "Organization", "name": "Nordic Cloud" },
+            "jobLocation": {
+              "@type": "Place",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Berlin",
+                "addressCountry": "DE"
+              }
+            },
+            "mainEntityOfPage": "https://jobs.example.com/nordic/devops-engineer"
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Open roles</h1>
+  </body>
+</html>
