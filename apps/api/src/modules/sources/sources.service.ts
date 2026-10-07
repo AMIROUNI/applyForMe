@@ -21,8 +21,10 @@ import {
   adapterById,
   resolveAdapter,
   unavailableReason,
+  type AdapterContext,
   type RegistrySource,
 } from '../scraper/adapters';
+import { ProviderKeysService } from '../provider-keys/provider-keys.service';
 import { SOURCE_SEED, type SeedSource } from './seed/source-seed.data';
 import { JobSource, emptyHealth, type JobSourceDocument } from './source.schema';
 import { assertSafeHttpUrl, assertSafeSourceConfig } from './url-guard';
@@ -48,7 +50,8 @@ export class SourcesService implements OnModuleInit {
   private readonly logger = new Logger(SourcesService.name);
 
   constructor(
-    @InjectModel(JobSource.name) private readonly sourceModel: Model<JobSourceDocument>
+    @InjectModel(JobSource.name) private readonly sourceModel: Model<JobSourceDocument>,
+    private readonly providerKeys: ProviderKeysService
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -92,10 +95,11 @@ export class SourcesService implements OnModuleInit {
 
   /**
    * Registry-driven resolution: requested ids -> adapter instances, plus a
-   * per-source reason for everything that cannot run. Falls back to the legacy
-   * in-code adapter map when the registry has never been seeded.
+   * per-source reason for everything that cannot run. `ctx` carries the
+   * user's provider tokens so `requiresUserToken` sources can resolve.
+   * Falls back to the legacy in-code adapter map when never seeded.
    */
-  async resolve(ids: string[]): Promise<ResolveResult> {
+  async resolve(ids: string[], ctx: AdapterContext = {}): Promise<ResolveResult> {
     const requested = ids.length ? ids : await this.defaultIds();
     const docs = await this.sourceModel.find({ id: { $in: requested } }).exec();
 
@@ -118,16 +122,17 @@ export class SourcesService implements OnModuleInit {
         rejected.push({ source: id, reason: inactiveReason(doc.status) });
         continue;
       }
-      if (entry.requiresUserToken) {
-        rejected.push({ source: id, reason: unavailableReason(entry) });
+      const tokenOk = entry.type === 'apify' ? Boolean(ctx.apifyToken) : false;
+      if (entry.requiresUserToken && !tokenOk) {
+        rejected.push({ source: id, reason: unavailableReason(entry, ctx) });
         continue;
       }
       if (doc.status !== 'active') {
         rejected.push({ source: id, reason: inactiveReason(doc.status) });
         continue;
       }
-      if (!resolveAdapter(entry)) {
-        rejected.push({ source: id, reason: unavailableReason(entry) });
+      if (!resolveAdapter(entry, ctx)) {
+        rejected.push({ source: id, reason: unavailableReason(entry, ctx) });
         continue;
       }
       usable.push(entry);
@@ -208,20 +213,32 @@ export class SourcesService implements OnModuleInit {
   /**
    * Dry run: fetch a sample through the source's adapter (or probe reachability
    * when no adapter exists yet), record health and preview up to 3 jobs.
+   * Apify sources need the user's connected token; without it we refuse
+   * instead of probing a site we are not allowed to scrape directly.
    */
-  async validate(_userId: string, id: string): Promise<SourceValidateResult> {
+  async validate(userId: string, id: string): Promise<SourceValidateResult> {
     const doc = await this.sourceModel.findOne({ id }).exec();
     if (!doc) throw this.notFound(id);
 
     const entry = toRegistry(doc);
-    const adapter = resolveAdapter(entry);
+    const apifyToken =
+      entry.type === 'apify' ? await this.providerKeys.getDecrypted(userId, 'apify') : null;
+    const ctx: AdapterContext = { apifyToken };
+    const adapter = resolveAdapter(entry, ctx);
     const startedAt = Date.now();
+
+    if (entry.requiresUserToken && !ctx.apifyToken) {
+      return this.notRunnable(doc, unavailableReason(entry, ctx));
+    }
 
     try {
       assertSafeHttpUrl(doc.baseUrl);
       assertSafeSourceConfig(doc.config as Record<string, unknown> | null);
 
       if (!adapter) {
+        if (entry.type === 'apify' || entry.type === 'ai_extract') {
+          return this.notRunnable(doc, unavailableReason(entry, ctx));
+        }
         await canFetch(doc.baseUrl);
         await fetchText(doc.baseUrl);
         const latencyMs = Date.now() - startedAt;
@@ -352,6 +369,22 @@ export class SourcesService implements OnModuleInit {
       code: 'SOURCE_NOT_FOUND',
       message: `Source "${id}" not found`,
     });
+  }
+
+  /** Validation refusal that must not touch the source's health record. */
+  private notRunnable(doc: JobSourceDocument, message: string): SourceValidateResult {
+    return {
+      id: doc.id,
+      ok: false,
+      reachable: false,
+      runnable: false,
+      message,
+      latencyMs: null,
+      sampleCount: 0,
+      preview: [],
+      status: doc.status,
+      health: doc.health,
+    };
   }
 }
 

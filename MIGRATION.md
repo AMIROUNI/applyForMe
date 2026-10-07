@@ -60,6 +60,26 @@ Consequences:
 - **SSRF:** `config.endpoint`, `config.feedUrls[]` and `config.sitemapUrl` are now validated with the same guard as `baseUrl` on create, patch, and validate — every URL a generic adapter fetches is a public http(s) address.
 - `RegistrySource` (internal resolver type) gained `baseUrl` and `remoteFriendly`.
 
+## Phase 3 — Apify connector
+
+LinkedIn, Indeed and Glassdoor now run through the user's own Apify account (rules.md: never scraped directly). New module `provider-keys` + adapter:
+
+| Piece | Where | What |
+|---|---|---|
+| Encrypted key storage | `provider-keys/crypto.ts` | AES-256-GCM, `v1:<iv>:<tag>:<ciphertext>`, random 12-byte IV; key material = `ENCRYPTION_KEY` (base64 32-byte used as-is, otherwise SHA-256). |
+| Collection `provider_keys` | `provider-key.schema.ts` | `{userId, provider, encryptedKey, lastFour, lastVerifiedAt}` — unique per user+provider. |
+| Endpoints | `provider-keys.controller.ts` | `GET /provider-keys` (masked state, never the token), `PUT /provider-keys/:provider` (verify with `GET /v2/users/me` **then** store), `DELETE /provider-keys/:provider`. Providers whitelisted (`apify` only for now). |
+| Apify adapter | `adapters/apify.adapter.ts` | `POST /v2/actors/{id}/run-sync-get-dataset-items` with `Authorization: Bearer` (never the query string), actor id normalized `a/b → a~b`, 50-item cap (`limit` + `maxItems`), 90s run budget, input = `config.inputTemplate` + ≤3 keywords as `queries`/`query`/`searchTerm`, output mapped by the generic JSON mapper. |
+| Context threading | `AdapterContext { apifyToken }` | `ScraperService.startRun` loads the token per user and passes it through `SourcesService.resolve(ids, ctx)` and `resolveAdapter(source, ctx)`; `validate()` loads it too. |
+
+Consequences:
+
+- `apify` sources are `requiresUserToken` and resolve **only** with a connected token; `unavailableReason` now says "Connect the Apify account to enable this source" (other providers keep the generic message). Non-`apify` `requiresUserToken` sources (e.g. France Travail) stay rejected — their key type is not implemented yet.
+- `POST /sources/:id/validate` on an Apify source without a token **refuses** (no reachability probe, no health penalty) with the connect message; with a token it runs the actor, previews jobs, and activates the source like any other.
+- The token travels only in headers; URLs and error messages never contain it, and responses expose at most `lastFour` + `lastVerifiedAt`.
+- UI: Sources page gained an "Apify integration" card (paste token → verified → masked state → disconnect) and `needsKey` badges flip to "Apify connected"; the scraper sidebar enables connected+active Apify sources and drops the "(Connect Apify to enable)" suffix once connected. Strings added to `translations.en.ts` / `translations.fr.ts`.
+- `fetchText` now honors a caller-supplied `signal` (the Apify run's 90s budget) instead of always forcing 15s.
+
 ## No action required
 
 - No new environment variables.

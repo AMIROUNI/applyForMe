@@ -62,11 +62,13 @@ const seedModel = async (model: ReturnType<typeof makeModel>): Promise<void> => 
 describe('SourcesService', () => {
   let model: ReturnType<typeof makeModel>;
   let service: SourcesService;
+  let providerKeys: { getDecrypted: jest.Mock };
   const originalRemotive = adapterById.get('remotive') as SourceAdapter;
 
   beforeEach(() => {
     model = makeModel();
-    service = new SourcesService(model as never);
+    providerKeys = { getDecrypted: jest.fn().mockResolvedValue(null) };
+    service = new SourcesService(model as never, providerKeys as never);
   });
 
   afterEach(() => {
@@ -137,7 +139,7 @@ describe('SourcesService', () => {
 
     expect(usable.map(source => source.id)).toEqual(['remotive']);
     expect(rejected).toEqual([
-      { source: 'linkedin', reason: 'Connect the provider API key to enable this source' },
+      { source: 'linkedin', reason: 'Connect the Apify account to enable this source' },
       { source: 'tanitjobs', reason: 'Source is disabled' },
       { source: 'nope', reason: 'Unknown source' },
     ]);
@@ -313,14 +315,58 @@ describe('SourcesService', () => {
     });
   });
 
-  it('probes reachability without an adapter and keeps the source pending', async () => {
+  it('refuses to validate an Apify source until a token is connected', async () => {
+    await seedModel(model);
+    const originalFetch = global.fetch;
+    const fetchMock = jest.fn();
+    global.fetch = fetchMock as never;
+
+    try {
+      const result = await service.validate('user-1', 'glassdoor');
+      expect(result).toMatchObject({
+        ok: false,
+        reachable: false,
+        runnable: false,
+        sampleCount: 0,
+        status: 'pending',
+      });
+      expect(result.message).toContain('Apify');
+      const row = model.rows.find(entry => entry.id === 'glassdoor');
+      expect(row?.save).not.toHaveBeenCalled();
+      expect(fetchMock).not.toHaveBeenCalled();
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
+
+  it('only resolves Apify sources when the account is connected', async () => {
     await seedModel(model);
     const row = model.rows.find(entry => entry.id === 'glassdoor');
-    const baseUrl = String(row?.baseUrl);
+    if (row) row.status = 'active';
+
+    const without = await service.resolve(['glassdoor']);
+    expect(without.usable).toHaveLength(0);
+    expect(without.rejected[0]?.reason).toContain('Apify');
+
+    const withToken = await service.resolve(['glassdoor'], { apifyToken: 'apify_api_TOK' });
+    expect(withToken.usable.map(entry => entry.id)).toEqual(['glassdoor']);
+    expect(withToken.rejected).toHaveLength(0);
+  });
+
+  it('runs an Apify source through the connected account and activates it', async () => {
+    await seedModel(model);
+    providerKeys.getDecrypted.mockResolvedValue('apify_api_TOK');
+    const dataset = Array.from({ length: 3 }, (_, index) => ({
+      title: `Backend Engineer ${index}`,
+      description: 'Node.js services',
+      jobUrl: `https://www.glassdoor.com/job/${index}`,
+      companyName: `Company ${index}`,
+      location: 'Paris, FR',
+    }));
     const originalFetch = global.fetch;
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      text: jest.fn().mockResolvedValue('<html></html>'),
+      text: jest.fn().mockResolvedValue(JSON.stringify(dataset)),
     }) as never;
 
     try {
@@ -328,15 +374,19 @@ describe('SourcesService', () => {
       expect(result).toMatchObject({
         ok: true,
         reachable: true,
-        runnable: false,
-        sampleCount: 0,
-        status: 'pending',
+        runnable: true,
+        sampleCount: 3,
+        status: 'active',
       });
-      expect(result.message).toContain('apify');
+      expect(result.preview).toHaveLength(3);
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining(new URL(baseUrl).hostname),
-        expect.anything()
+        expect.stringContaining('https://api.apify.com/v2/actors/'),
+        expect.objectContaining({
+          method: 'POST',
+          headers: expect.objectContaining({ Authorization: 'Bearer apify_api_TOK' }),
+        })
       );
+      expect(String((global.fetch as jest.Mock).mock.calls[0][0])).not.toContain('apify_api_TOK');
     } finally {
       global.fetch = originalFetch;
     }

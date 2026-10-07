@@ -34,6 +34,12 @@ export interface SourceAdapter {
   scrape(params: ScrapeParams): Promise<NormalizedJob[]>;
 }
 
+/** Per-run secrets handed to adapter factories; never persisted on a source. */
+export interface AdapterContext {
+  /** Decrypted user Apify token, when one is connected for this user. */
+  apifyToken?: string | null;
+}
+
 /** A source as stored in the `job_sources` registry, reduced to what a resolver/adapter needs. */
 export interface RegistrySource {
   id: string;

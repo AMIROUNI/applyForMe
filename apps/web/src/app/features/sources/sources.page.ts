@@ -9,8 +9,15 @@ import { SkeletonComponent } from '../../shared/ui/skeleton/skeleton.component';
 import { MultiSelectComponent } from '../../shared/ui/multi-select/multi-select.component';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { SourcesService } from './data/sources.service';
+import { ProviderKeysService } from './data/provider-keys.service';
 import { COUNTRY_OPTIONS } from '../dashboard/data/dashboard.constants';
-import type { CreateSource, JobSource, SourceType, SourceValidateResult } from '@shared';
+import type {
+  CreateSource,
+  JobSource,
+  ProviderKeyInfo,
+  SourceType,
+  SourceValidateResult,
+} from '@shared';
 
 type SourceStatusFilter = '' | 'active' | 'pending' | 'disabled' | 'broken';
 
@@ -149,6 +156,68 @@ interface SourceGroup {
           </app-button>
         </div>
 
+        <section
+          class="sources__form sources__apify"
+          [attr.aria-label]="t()['sources.apify.title']"
+        >
+          <div class="sources__apify-text">
+            <h2 class="sources__form-title">{{ t()['sources.apify.title'] }}</h2>
+            <p class="sources__form-hint">{{ t()['sources.apify.desc'] }}</p>
+          </div>
+
+          @if (apify(); as key) {
+            @if (key.connected) {
+              <div class="sources__apify-state">
+                <app-badge tone="success" [withDot]="true">
+                  {{ t()['sources.apify.connected'] }}
+                </app-badge>
+                <span>
+                  {{ t()['sources.apify.tokenMasked'].replace('{lastFour}', key.lastFour ?? '') }}
+                </span>
+                @if (key.lastVerifiedAt; as verified) {
+                  <span class="sources__apify-meta">
+                    {{ t()['sources.apify.verified'] }} {{ verified | date: 'short' }}
+                  </span>
+                }
+                <app-button
+                  variant="ghost"
+                  size="compact"
+                  [loading]="apifyBusy()"
+                  (clicked)="disconnectApify()"
+                >
+                  {{ t()['sources.apify.disconnect'] }}
+                </app-button>
+              </div>
+            } @else {
+              <div class="sources__apify-form">
+                <label class="sources__field">
+                  <span>{{ t()['sources.apify.token'] }}</span>
+                  <input
+                    class="sources__input"
+                    type="password"
+                    autocomplete="off"
+                    [placeholder]="t()['sources.apify.tokenPlaceholder']"
+                    [value]="apifyTokenDraft()"
+                    (input)="apifyTokenDraft.set($any($event.target).value)"
+                    (keydown.enter)="connectApify()"
+                  />
+                </label>
+                <app-button
+                  variant="primary"
+                  size="compact"
+                  [loading]="apifyBusy()"
+                  [disabled]="apifyTokenDraft().trim().length < 10"
+                  (clicked)="connectApify()"
+                >
+                  {{ t()['sources.apify.connect'] }}
+                </app-button>
+              </div>
+              @if (apifyError(); as error) {
+                <p class="sources__form-error" role="alert">{{ error }}</p>
+              }
+            }
+          }
+        </section>
         @if (formOpen()) {
           <section class="sources__form" [attr.aria-label]="t()['sources.addTitle']">
             <h2 class="sources__form-title">{{ t()['sources.addTitle'] }}</h2>
@@ -264,7 +333,13 @@ interface SourceGroup {
                     </div>
 
                     @if (source.requiresUserToken) {
-                      <app-badge tone="info">{{ t()['sources.needsKey'] }}</app-badge>
+                      <app-badge [tone]="hasTokenFor(source) ? 'success' : 'info'">
+                        {{
+                          hasTokenFor(source)
+                            ? t()['sources.apify.connected']
+                            : t()['sources.needsKey']
+                        }}
+                      </app-badge>
                     }
 
                     <p class="source-card__desc">{{ source.description }}</p>
@@ -603,6 +678,30 @@ interface SourceGroup {
         flex-wrap: wrap;
       }
 
+      .sources__apify {
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .sources__apify-text {
+        flex: 1 1 240px;
+      }
+
+      .sources__apify-state {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--spacing-2);
+        font-size: var(--text-xs);
+      }
+
+      .sources__apify-form {
+        display: flex;
+        align-items: flex-end;
+        flex-wrap: wrap;
+        gap: var(--spacing-2);
+      }
+
       .sources__group-title {
         display: flex;
         align-items: center;
@@ -831,6 +930,7 @@ interface SourceGroup {
 export class SourcesPageComponent implements OnInit {
   private i18n = inject(I18nService);
   private sourcesService = inject(SourcesService);
+  private providerKeys = inject(ProviderKeysService);
 
   readonly loading = signal(true);
   readonly error = signal(false);
@@ -840,6 +940,12 @@ export class SourcesPageComponent implements OnInit {
   readonly validatingId = signal<string | null>(null);
   readonly preview = signal<SourceValidateResult | null>(null);
   readonly notice = signal<string | null>(null);
+
+  readonly apify = signal<ProviderKeyInfo | null>(null);
+  readonly apifyTokenDraft = signal('');
+  readonly apifyBusy = signal(false);
+  readonly apifyError = signal<string | null>(null);
+  readonly apifyConnected = computed(() => this.apify()?.connected ?? false);
 
   readonly formOpen = signal(false);
   readonly formName = signal('');
@@ -919,6 +1025,7 @@ export class SourcesPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.load();
+    this.loadKeys();
   }
 
   load(): void {
@@ -934,6 +1041,54 @@ export class SourcesPageComponent implements OnInit {
         this.loading.set(false);
       },
     });
+  }
+
+  loadKeys(): void {
+    this.providerKeys.list().subscribe({
+      next: (list) => this.apify.set(list.find((info) => info.provider === 'apify') ?? null),
+      error: () => undefined,
+    });
+  }
+
+  connectApify(): void {
+    const token = this.apifyTokenDraft().trim();
+    if (token.length < 10 || this.apifyBusy()) return;
+    this.apifyBusy.set(true);
+    this.apifyError.set(null);
+    this.providerKeys.connect('apify', token).subscribe({
+      next: (info) => {
+        this.apifyBusy.set(false);
+        this.apifyTokenDraft.set('');
+        this.apify.set(info);
+        this.notice.set(this.t()['sources.apify.connectedNotice']);
+        this.load();
+      },
+      error: (err) => {
+        this.apifyBusy.set(false);
+        this.apifyError.set(err?.error?.message ?? this.t()['sources.apify.failed']);
+      },
+    });
+  }
+
+  disconnectApify(): void {
+    if (this.apifyBusy()) return;
+    this.apifyBusy.set(true);
+    this.apifyError.set(null);
+    this.providerKeys.disconnect('apify').subscribe({
+      next: () => {
+        this.apifyBusy.set(false);
+        this.loadKeys();
+        this.load();
+      },
+      error: () => {
+        this.apifyBusy.set(false);
+        this.apifyError.set(this.t()['sources.error']);
+      },
+    });
+  }
+
+  hasTokenFor(source: JobSource): boolean {
+    return !source.requiresUserToken || (source.type === 'apify' && this.apifyConnected());
   }
 
   validate(source: JobSource): void {

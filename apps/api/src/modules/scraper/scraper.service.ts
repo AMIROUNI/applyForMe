@@ -11,8 +11,9 @@ import type { Model } from 'mongoose';
 import type { ScraperRun, ScraperRunStart } from '@agency-apply/shared';
 import { delay } from './http';
 import { scoreJob } from './normalize';
-import { resolveAdapter, type RegistrySource } from './adapters';
+import { resolveAdapter, type AdapterContext, type RegistrySource } from './adapters';
 import { SourcesService } from '../sources/sources.service';
+import { ProviderKeysService } from '../provider-keys/provider-keys.service';
 import type { NormalizedJob, ScrapeParams } from './scraper.types';
 import type { JobDocument } from '../jobs/job.schema';
 import type { ScrapeRunDocument } from './run.schema';
@@ -28,7 +29,8 @@ export class ScraperService {
   constructor(
     @InjectModel('ScrapeRun') private readonly runModel: Model<ScrapeRunDocument>,
     @InjectModel('Job') private readonly jobModel: Model<JobDocument>,
-    private readonly sources: SourcesService
+    private readonly sources: SourcesService,
+    private readonly providerKeys: ProviderKeysService
   ) {}
 
   async startRun(userId: string, dto: ScraperRunStart): Promise<ScraperRun> {
@@ -43,7 +45,9 @@ export class ScraperService {
       });
     }
 
-    const { usable, rejected } = await this.sources.resolve(dto.sources);
+    const apifyToken = await this.providerKeys.getDecrypted(userId, 'apify');
+    const ctx: AdapterContext = { apifyToken };
+    const { usable, rejected } = await this.sources.resolve(dto.sources, ctx);
 
     if (!usable.length) {
       throw new BadRequestException({
@@ -67,7 +71,7 @@ export class ScraperService {
       finishedAt: null,
     });
 
-    void this.execute(String(run._id), usable).catch(error => {
+    void this.execute(String(run._id), usable, ctx).catch(error => {
       this.logger.error(`Scraper run ${run._id} crashed`, error?.stack ?? error);
     });
 
@@ -86,7 +90,11 @@ export class ScraperService {
     return this.toDto(run);
   }
 
-  private async execute(runId: string, resolved: RegistrySource[]): Promise<void> {
+  private async execute(
+    runId: string,
+    resolved: RegistrySource[],
+    ctx: AdapterContext
+  ): Promise<void> {
     const run = await this.runModel.findById(runId).exec();
     if (!run) return;
 
@@ -104,7 +112,7 @@ export class ScraperService {
     const seen = new Set<string>();
 
     for (const source of resolved) {
-      const adapter = resolveAdapter(source);
+      const adapter = resolveAdapter(source, ctx);
       if (!adapter) {
         failed += 1;
         run.errors.push({ source: source.id, message: 'No adapter available for this source' });

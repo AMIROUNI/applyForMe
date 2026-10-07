@@ -19,7 +19,8 @@ export async function fetchText(url: string, init?: RequestInit): Promise<string
     try {
       response = await fetch(url, {
         ...init,
-        signal: AbortSignal.timeout(TIMEOUT_MS),
+        // Callers (e.g. the Apify connector) may pass a longer budget signal.
+        signal: init?.signal ?? AbortSignal.timeout(TIMEOUT_MS),
         headers: {
           'User-Agent': USER_AGENT,
           Accept: '*/*',

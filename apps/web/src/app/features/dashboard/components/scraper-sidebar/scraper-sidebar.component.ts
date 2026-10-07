@@ -16,6 +16,7 @@ import { MultiSelectComponent } from '../../../../shared/ui/multi-select/multi-s
 import { ButtonComponent } from '../../../../shared/ui/button/button.component';
 import { I18nService } from '../../../../core/i18n/i18n.service';
 import { SourcesService } from '../../../sources/data/sources.service';
+import { ProviderKeysService } from '../../../sources/data/provider-keys.service';
 import { COUNTRY_OPTIONS, SOURCE_OPTIONS } from '../../data/dashboard.constants';
 
 export interface ScraperRun {
@@ -324,6 +325,7 @@ const sameList = (a: string[], b: string[]): boolean =>
 export class ScraperSidebarComponent {
   private i18n = inject(I18nService);
   private sourcesService = inject(SourcesService);
+  private providerKeys = inject(ProviderKeysService);
 
   filters = input<JobFilters>(emptyJobFilters());
   query = input('');
@@ -340,10 +342,17 @@ export class ScraperSidebarComponent {
   registry = signal<JobSource[]>([]);
   registryLoaded = signal(false);
 
+  /** Whether the user connected their Apify account (enables apify sources). */
+  apifyConnected = signal(false);
+
   t = computed(() => this.i18n.t());
 
+  private hasTokenFor(source: JobSource): boolean {
+    return !source.requiresUserToken || (source.type === 'apify' && this.apifyConnected());
+  }
+
   private isRunnable(source: JobSource): boolean {
-    return source.status === 'active' && !source.requiresUserToken;
+    return source.status === 'active' && this.hasTokenFor(source);
   }
 
   /** Sources relevant to the selected countries (global sources always show). */
@@ -376,7 +385,7 @@ export class ScraperSidebarComponent {
           Number(this.isRunnable(b)) - Number(this.isRunnable(a)) || a.name.localeCompare(b.name),
       )
       .map((source) => {
-        const suffix = source.requiresUserToken
+        const suffix = !this.hasTokenFor(source)
           ? ` (${t['sources.needsKey']})`
           : !this.isRunnable(source)
             ? ` (${t[`sources.status.${source.status}`] ?? source.status})`
@@ -404,6 +413,12 @@ export class ScraperSidebarComponent {
         this.registryLoaded.set(true);
       },
       error: () => this.registryLoaded.set(true),
+    });
+
+    this.providerKeys.list().subscribe({
+      next: (list) =>
+        this.apifyConnected.set(list.some((info) => info.provider === 'apify' && info.connected)),
+      error: () => undefined,
     });
 
     effect(() => {
