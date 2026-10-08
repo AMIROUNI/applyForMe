@@ -9,6 +9,7 @@ import {
   type ScraperRun,
 } from './components/scraper-sidebar/scraper-sidebar.component';
 import { DashboardState } from './data/dashboard.state';
+import { ExtensionTasksComponent } from './components/extension-tasks/extension-tasks.component';
 import { I18nService } from '../../core/i18n/i18n.service';
 
 @Component({
@@ -20,6 +21,7 @@ import { I18nService } from '../../core/i18n/i18n.service';
     SearchFilterBarComponent,
     JobCardsGridComponent,
     ScraperSidebarComponent,
+    ExtensionTasksComponent,
   ],
   template: `
     <div class="dashboard">
@@ -137,6 +139,17 @@ import { I18nService } from '../../core/i18n/i18n.service';
                 </svg>
               </button>
             </div>
+          }
+
+          @if (state.scraperRun(); as run) {
+            @if (run.extensionTasks.length > 0) {
+              <app-extension-tasks
+                [run]="run"
+                [pendingId]="state.taskActionPendingId()"
+                [error]="state.taskActionError()"
+                (action)="state.updateExtensionTask(run.id, $event.taskId, $event.action)"
+              />
+            }
           }
 
           <app-search-filter-bar

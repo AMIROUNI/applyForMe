@@ -122,6 +122,31 @@ describe('JobsService', () => {
     req.flush(run);
   });
 
+  it('patches an extension task action on a run', () => {
+    const run = {
+      id: 'run-1',
+      status: 'running',
+      sources: [],
+      keywords: [],
+      countries: [],
+      remoteOnly: false,
+      progress: { total: 1, done: 0, found: 0 },
+      errors: [],
+      extensionTasks: [],
+      startedAt: null,
+      finishedAt: null,
+    };
+
+    service.updateExtensionTask('run-1', 'task-1', 'retry').subscribe((result) => {
+      expect(result.id).toBe('run-1');
+    });
+
+    const req = httpMock.expectOne('/api/v1/scraper/runs/run-1/extension-tasks/task-1');
+    expect(req.request.method).toBe('PATCH');
+    expect(req.request.body).toEqual({ action: 'retry' });
+    req.flush(run);
+  });
+
   it('propagates API errors to the subscriber', () => {
     let status = 0;
     service.search(request).subscribe({ error: (err) => (status = err.status) });

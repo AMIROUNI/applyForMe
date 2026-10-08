@@ -7,6 +7,7 @@ import { ButtonComponent } from '../../shared/ui/button/button.component';
 import { EmptyStateComponent } from '../../shared/ui/empty-state/empty-state.component';
 import { SkeletonComponent } from '../../shared/ui/skeleton/skeleton.component';
 import { MultiSelectComponent } from '../../shared/ui/multi-select/multi-select.component';
+import { ExtensionPairingComponent } from './components/extension-pairing/extension-pairing.component';
 import { I18nService } from '../../core/i18n/i18n.service';
 import { SourcesService } from './data/sources.service';
 import { COUNTRY_OPTIONS } from '../dashboard/data/dashboard.constants';
@@ -37,6 +38,7 @@ interface SourceGroup {
     EmptyStateComponent,
     SkeletonComponent,
     MultiSelectComponent,
+    ExtensionPairingComponent,
   ],
   template: `
     <div class="sources">
@@ -98,6 +100,8 @@ interface SourceGroup {
             </button>
           </div>
         }
+
+        <app-extension-pairing />
 
         <div class="sources__toolbar">
           <div

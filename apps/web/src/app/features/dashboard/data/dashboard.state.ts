@@ -1,7 +1,14 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import type { Subscription } from 'rxjs';
 import { interval, startWith, switchMap } from 'rxjs';
-import type { Job, JobFilters, JobSort, ScraperRun, ScraperRunStart } from '@shared';
+import type {
+  ExtensionTaskAction,
+  Job,
+  JobFilters,
+  JobSort,
+  ScraperRun,
+  ScraperRunStart,
+} from '@shared';
 import { emptyJobFilters } from '@shared';
 import { JobsService } from './jobs.service';
 
@@ -40,6 +47,13 @@ export class DashboardState {
   readonly scraperRunning = signal(false);
   readonly scraperRun = signal<ScraperRun | null>(null);
   readonly scraperRunError = signal<string | null>(null);
+
+  /** Browser-task action state for the extension tasks panel. */
+  readonly taskActionPendingId = signal<string | null>(null);
+  readonly taskActionError = signal<string | null>(null);
+
+  /** Filters that belong to the run currently tracked (for poll completion). */
+  private lastRunFilters: JobFilters | null = null;
 
   readonly hasActiveSearch = computed(
     () => this.query().trim().length > 0 || countActiveFilters(this.filters()) > 0,
@@ -91,6 +105,7 @@ export class DashboardState {
     this.scraperRun.set(null);
 
     const { filters, ...runStart } = params;
+    this.lastRunFilters = filters;
     this.jobsService.startScraperRun(runStart).subscribe({
       next: (run) => {
         this.scraperRun.set(run);
@@ -105,6 +120,41 @@ export class DashboardState {
 
   runSearch(sort: JobSort = 'matchScore'): void {
     this.fetch(1, sort, true);
+  }
+
+  /**
+   * Cancels, skips or retries one browser-extension task. A retry reopens the
+   * run server-side, so polling resumes to track it to completion again.
+   */
+  updateExtensionTask(runId: string, taskId: string, action: ExtensionTaskAction): void {
+    if (this.taskActionPendingId()) return;
+    const wasActive = this.scraperRunning();
+    this.taskActionPendingId.set(taskId);
+    this.taskActionError.set(null);
+
+    this.jobsService.updateExtensionTask(runId, taskId, action).subscribe({
+      next: (run) => {
+        this.taskActionPendingId.set(null);
+        this.scraperRun.set(run);
+        const active = run.status === 'queued' || run.status === 'running';
+        this.scraperRunning.set(active);
+        if (active) {
+          this.pollRun(run.id, this.lastRunFilters ?? this.filters());
+        } else {
+          this.pollSub?.unsubscribe();
+          this.pollSub = null;
+          if (wasActive) this.completeRun(this.lastRunFilters ?? this.filters());
+        }
+      },
+      error: (err) => {
+        this.taskActionPendingId.set(null);
+        this.taskActionError.set(
+          err?.error?.code === 'TASK_STATE_INVALID'
+            ? 'extension.tasks.actionStale'
+            : 'extension.tasks.actionFailed',
+        );
+      },
+    });
   }
 
   loadMore(sort: JobSort = 'matchScore'): void {
@@ -123,11 +173,7 @@ export class DashboardState {
         next: (run) => {
           this.scraperRun.set(run);
           if (run.status === 'done' || run.status === 'failed') {
-            this.pollSub?.unsubscribe();
-            this.scraperRunning.set(false);
-            this.query.set('');
-            this.filters.set(filters);
-            this.runSearch();
+            this.completeRun(filters);
           }
         },
         error: () => {
@@ -136,6 +182,16 @@ export class DashboardState {
           this.scraperRunError.set('dashboard.scraperPollFailed');
         },
       });
+  }
+
+  /** The run is over: stop polling, apply its filters, and show the results. */
+  private completeRun(filters: JobFilters): void {
+    this.pollSub?.unsubscribe();
+    this.pollSub = null;
+    this.scraperRunning.set(false);
+    this.query.set('');
+    this.filters.set(filters);
+    this.runSearch();
   }
 
   private fetch(page: number, sort: JobSort, reset: boolean): void {

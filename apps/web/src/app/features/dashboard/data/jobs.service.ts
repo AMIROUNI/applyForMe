@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import type { Observable } from 'rxjs';
 import type { JobSearchRequest, JobSearchResponse } from '@shared';
-import type { ScraperRun, ScraperRunStart } from '@shared';
+import type { ExtensionTaskAction, ScraperRun, ScraperRunStart } from '@shared';
 
 const API = '/api/v1';
 
@@ -24,5 +24,16 @@ export class JobsService {
 
   getScraperRun(id: string): Observable<ScraperRun> {
     return this.http.get<ScraperRun>(`${API}/scraper/runs/${id}`);
+  }
+
+  /** Cancel / skip / retry one browser-extension task of a run. */
+  updateExtensionTask(
+    runId: string,
+    taskId: string,
+    action: ExtensionTaskAction,
+  ): Observable<ScraperRun> {
+    return this.http.patch<ScraperRun>(`${API}/scraper/runs/${runId}/extension-tasks/${taskId}`, {
+      action,
+    });
   }
 }

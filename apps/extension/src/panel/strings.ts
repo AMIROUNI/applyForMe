@@ -1,6 +1,6 @@
 const en = {
   connectTitle: 'Connect your browser',
-  pairingHint: 'In the web app, open Settings → Browser extension to create a pairing code.',
+  pairingHint: 'In the web app, open Sources → Browser extension to create a pairing code.',
   apiBase: 'API address',
   codeLabel: 'Pairing code',
   codePlaceholder: 'e.g. K7M2QX9P',
@@ -39,7 +39,7 @@ export type Strings = typeof en;
 const fr: Strings = {
   connectTitle: 'Connecter ce navigateur',
   pairingHint:
-    'Dans l’application web, ouvrez Paramètres → Extension navigateur pour créer un code.',
+    'Dans l’application web, ouvrez Sources → Extension de navigateur pour créer un code.',
   apiBase: 'Adresse de l’API',
   codeLabel: 'Code de jumelage',
   codePlaceholder: 'ex. K7M2QX9P',
