@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ApplyForME</title>
+    <link rel="stylesheet" href="panel.css" />
+  </head>
+  <body>
+    <header class="header">
+      <h1>ApplyForME</h1>
+      <button id="disconnect" class="link" type="button" hidden></button>
+    </header>
+
+    <main>
+      <section id="pairing" hidden>
+        <p id="pairing-hint" class="hint"></p>
+        <label>
+          <span id="api-base-label"></span>
+          <input id="api-base" type="url" spellcheck="false" autocomplete="off" />
+        </label>
+        <label>
+          <span id="code-label"></span>
+          <input id="code" type="text" maxlength="64" spellcheck="false" autocomplete="off" />
+        </label>
+        <p id="pairing-error" class="error" hidden></p>
+        <button id="pair" class="primary" type="button"></button>
+      </section>
+
+      <section id="collector" hidden>
+        <h2 id="tasks-title"></h2>
+        <ul id="task-list" class="tasks"></ul>
+        <p id="no-tasks" class="hint" hidden></p>
+        <div id="progress" class="progress" hidden>
+          <p id="progress-line"></p>
+          <p id="progress-items" class="hint"></p>
+        </div>
+        <p id="keep-open" class="hint" hidden></p>
+        <p id="run-summary" class="hint" hidden></p>
+        <p id="run-error" class="error" hidden></p>
+        <div class="actions">
+          <button id="start" class="primary" type="button"></button>
+          <button id="stop" class="danger" type="button" hidden></button>
+          <button id="refresh" type="button"></button>
+        </div>
+      </section>
+    </main>
+
+    <div id="consent" class="modal" hidden>
+      <div class="modal-card">
+        <h3 id="consent-title"></h3>
+        <p id="consent-body"></p>
+        <div class="actions">
+          <button id="consent-cancel" type="button"></button>
+          <button id="consent-allow" class="primary" type="button"></button>
+        </div>
+      </div>
+    </div>
+
+    <script src="panel.js"></script>
+  </body>
+</html>

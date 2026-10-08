@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "ApplyForME Extension",
+  "version": "0.1.0",
+  "description": "Collects job listings from LinkedIn and Indeed in your own browser for ApplyForME runs.",
+  "minimum_chrome_version": "114",
+  "action": {
+    "default_title": "Open ApplyForME"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "side_panel": {
+    "default_path": "panel.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://linkedin.com/*", "https://*.linkedin.com/*", "https://indeed.com/*", "https://*.indeed.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": ["tabs", "storage", "sidePanel"],
+  "host_permissions": [
+    "http://localhost/*",
+    "http://127.0.0.1/*",
+    "https://linkedin.com/*",
+    "https://*.linkedin.com/*",
+    "https://indeed.com/*",
+    "https://*.indeed.com/*"
+  ]
+}
