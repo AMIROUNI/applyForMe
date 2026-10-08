@@ -1,7 +1,12 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
-import { scraperRunStartSchema } from '@agency-apply/shared';
-import type { ScraperRun, ScraperRunStart } from '@agency-apply/shared';
+import {
+  extensionTaskActionSchema,
+  scraperRunStartSchema,
+  type ExtensionTaskAction,
+  type ScraperRun,
+  type ScraperRunStart,
+} from '@agency-apply/shared';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { ScraperService } from './scraper.service';
 
@@ -20,5 +25,15 @@ export class ScraperController {
   @Get(':id')
   getRun(@CurrentUser() user: { id: string }, @Param('id') id: string): Promise<ScraperRun> {
     return this.scraper.getRun(user.id, id);
+  }
+
+  @Patch(':id/extension-tasks/:taskId')
+  updateExtensionTask(
+    @CurrentUser() user: { id: string },
+    @Param('id') id: string,
+    @Param('taskId') taskId: string,
+    @Body(new ZodValidationPipe(extensionTaskActionSchema)) body: { action: ExtensionTaskAction }
+  ): Promise<ScraperRun> {
+    return this.scraper.updateTaskByUser(user.id, id, taskId, body.action);
   }
 }

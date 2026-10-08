@@ -51,6 +51,8 @@ async function main(): Promise<void> {
           status: seed.status,
           config: seed.config,
           requiresUserToken: seed.requiresUserToken,
+          executionMode: seed.executionMode ?? 'server',
+          requiresExtension: Boolean(seed.requiresExtension),
           addedBy: seed.addedBy,
         },
         $setOnInsert: { health: emptyHealth(), ownerId: null },

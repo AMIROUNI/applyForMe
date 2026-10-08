@@ -1,4 +1,4 @@
-import type { SourceConfig, SourceType } from '@agency-apply/shared';
+import type { SourceConfig, SourceExecutionMode, SourceType } from '@agency-apply/shared';
 
 export type RemoteType = 'onsite' | 'hybrid' | 'remote';
 export type JobType = 'all' | 'full-time' | 'part-time' | 'contract' | 'internship';
@@ -46,4 +46,6 @@ export interface RegistrySource {
   remoteFriendly: boolean;
   config: SourceConfig;
   requiresUserToken: boolean;
+  executionMode: SourceExecutionMode;
+  requiresExtension: boolean;
 }

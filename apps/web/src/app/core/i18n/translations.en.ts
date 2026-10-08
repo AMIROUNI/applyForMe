@@ -236,7 +236,8 @@ export const enTranslations: Record<string, string> = {
   'scraper.manageSources': 'Manage sources',
 
   // Sources
-  'source.linkedin': 'LinkedIn',
+  'source.linkedinJobs': 'LinkedIn Jobs',
+  'source.linkedinPosts': 'LinkedIn hiring posts',
   'source.indeed': 'Indeed',
   'source.tanitjobs': 'TanitJobs',
   'source.emploiNat': 'Emploi.nat.tn',
@@ -268,6 +269,7 @@ export const enTranslations: Record<string, string> = {
   'sources.type.html': 'HTML',
   'sources.type.ai_extract': 'AI extract',
   'sources.needsKey': 'Connect a provider key to enable',
+  'sources.browser': 'in your browser',
   'sources.remoteFriendly': 'Remote friendly',
   'sources.filter.country': 'Filter by country',
   'sources.filter.status': 'Filter by status',

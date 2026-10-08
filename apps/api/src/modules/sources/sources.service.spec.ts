@@ -119,6 +119,9 @@ describe('SourcesService', () => {
     const active = await service.list({ status: 'active' });
     expect(active.map(source => source.id).sort()).toEqual([
       'arbeitnow',
+      'indeed',
+      'linkedin_jobs',
+      'linkedin_posts',
       'remoteok',
       'remotive',
       'weworkremotely',
@@ -167,9 +170,140 @@ describe('SourcesService', () => {
         remoteFriendly: true,
         config: { adapterId: 'remotive' },
         requiresUserToken: false,
+        executionMode: 'server',
+        requiresExtension: false,
       },
     ]);
     expect(rejected).toEqual([{ source: 'unknown', reason: 'Unknown source' }]);
+  });
+
+  it('sends extension sources to the browser instead of a server adapter', async () => {
+    await seedModel(model);
+
+    const { usable, extension, rejected } = await service.resolve([
+      'remotive',
+      'linkedin_jobs',
+      'indeed',
+      'linkedin-posts',
+    ]);
+
+    expect(usable.map(source => source.id)).toEqual(['remotive']);
+    expect(extension.map(source => source.id)).toEqual(['linkedin_jobs', 'indeed']);
+    expect(extension[0]).toMatchObject({
+      executionMode: 'extension',
+      requiresExtension: true,
+      requiresUserToken: false,
+    });
+    expect(rejected).toEqual([{ source: 'linkedin-posts', reason: 'Unknown source' }]);
+  });
+
+  it('keeps inactive extension sources out of runs', async () => {
+    await seedModel(model);
+    const pending = model.rows.find(row => row.id === 'linkedin_jobs');
+    if (pending) pending.status = 'pending';
+
+    const { extension, rejected } = await service.resolve(['linkedin_jobs']);
+    expect(extension).toEqual([]);
+    expect(rejected).toEqual([
+      { source: 'linkedin_jobs', reason: 'Source is awaiting validation' },
+    ]);
+  });
+
+  it('never puts extension sources in the default run set', async () => {
+    await seedModel(model);
+
+    expect(await service.defaultIds()).toEqual([
+      'remotive',
+      'remoteok',
+      'arbeitnow',
+      'weworkremotely',
+    ]);
+    const { usable, extension } = await service.resolve([]);
+    expect(usable.map(source => source.id)).not.toContain('linkedin_jobs');
+    expect(extension).toEqual([]);
+  });
+
+  it('refuses to probe an extension source from our servers', async () => {
+    await seedModel(model);
+
+    const result = await service.validate('user-1', 'linkedin_jobs');
+    expect(result).toMatchObject({ ok: false, reachable: false, runnable: false });
+    expect(result.message).toContain('applyForMe extension');
+  });
+
+  it('routes known extension ids through the browser even with an empty registry', async () => {
+    const { usable, extension, rejected } = await service.resolve(['remotive', 'linkedin_jobs']);
+
+    expect(usable.map(source => source.id)).toEqual(['remotive']);
+    expect(extension).toEqual([
+      {
+        id: 'linkedin_jobs',
+        name: 'linkedin_jobs',
+        baseUrl: 'https://www.linkedin.com/jobs',
+        type: 'html',
+        remoteFriendly: true,
+        config: {},
+        requiresUserToken: false,
+        executionMode: 'extension',
+        requiresExtension: true,
+      },
+    ]);
+    expect(rejected).toEqual([]);
+  });
+
+  it('migrates retired Apify entries to extension mode and disables the rest', async () => {
+    model.rows.push(
+      makeDoc({
+        id: 'linkedin',
+        name: 'LinkedIn',
+        baseUrl: 'https://www.linkedin.com/jobs',
+        type: 'apify',
+        countries: ['*'],
+        categories: ['general'],
+        remoteFriendly: true,
+        status: 'active',
+        config: { apifyActorId: 'apify/linkedin-jobs-scraper' },
+        requiresUserToken: false,
+        addedBy: 'system',
+        ownerId: null,
+        health: { failureCount: 0 },
+      }),
+      makeDoc({
+        id: 'glassdoor',
+        name: 'Glassdoor',
+        baseUrl: 'https://www.glassdoor.com',
+        type: 'apify',
+        countries: ['*'],
+        categories: ['general'],
+        remoteFriendly: true,
+        status: 'active',
+        config: { apifyActorId: 'apify/glassdoor-scraper' },
+        requiresUserToken: false,
+        addedBy: 'system',
+        ownerId: null,
+        health: { failureCount: 0 },
+      })
+    );
+
+    await service.migrateLegacySources();
+
+    const linkedin = model.rows.find(row => row.id === 'linkedin_jobs');
+    expect(linkedin).toMatchObject({
+      name: 'LinkedIn Jobs',
+      type: 'html',
+      status: 'active',
+      executionMode: 'extension',
+      requiresExtension: true,
+      config: {},
+    });
+    expect(model.rows.some(row => row.id === 'linkedin')).toBe(false);
+
+    expect(model.rows.find(row => row.id === 'glassdoor')).toMatchObject({
+      type: 'html',
+      status: 'disabled',
+      executionMode: 'server',
+      requiresExtension: false,
+    });
   });
 
   it('rejects unsafe URLs when adding a custom source', async () => {

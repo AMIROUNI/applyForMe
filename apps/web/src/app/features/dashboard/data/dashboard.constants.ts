@@ -3,6 +3,7 @@ import type { MultiSelectOption } from '../../../shared/ui/multi-select/multi-se
 
 export interface LabelledOption extends MultiSelectOption {
   labelKey: string;
+  browser?: boolean;
 }
 
 export const COUNTRY_OPTIONS: LabelledOption[] = [
@@ -52,6 +53,17 @@ export const SOURCE_OPTIONS: LabelledOption[] = [
   { value: 'emploi_nat_tn', label: 'Emploi.nat.tn', labelKey: 'source.emploiNat', disabled: true },
   { value: 'tanitjobs', label: 'TanitJobs', labelKey: 'source.tanitjobs', disabled: true },
   { value: 'keepjob', label: 'KeepJob', labelKey: 'source.keepjob', disabled: true },
-  { value: 'linkedin', label: 'LinkedIn', labelKey: 'source.linkedin', disabled: true },
-  { value: 'indeed', label: 'Indeed', labelKey: 'source.indeed', disabled: true },
+  {
+    value: 'linkedin_jobs',
+    label: 'LinkedIn Jobs',
+    labelKey: 'source.linkedinJobs',
+    browser: true,
+  },
+  {
+    value: 'linkedin_posts',
+    label: 'LinkedIn hiring posts',
+    labelKey: 'source.linkedinPosts',
+    browser: true,
+  },
+  { value: 'indeed', label: 'Indeed', labelKey: 'source.indeed', browser: true },
 ];

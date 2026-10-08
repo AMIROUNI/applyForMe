@@ -367,10 +367,9 @@ export class ScraperSidebarComponent {
     if (!this.registryLoaded() || this.registry().length === 0) {
       return SOURCE_OPTIONS.map((option) => {
         const label = t[option.labelKey] ?? option.label;
-        return {
-          ...option,
-          label: option.disabled ? `${label} (${t['source.unavailable']})` : label,
-        };
+        if (option.disabled) return { ...option, label: `${label} (${t['source.unavailable']})` };
+        if (option.browser) return { ...option, label: `${label} (${t['sources.browser']})` };
+        return { ...option, label };
       });
     }
 
@@ -384,7 +383,9 @@ export class ScraperSidebarComponent {
           ? ` (${t['sources.needsKey']})`
           : !this.isRunnable(source)
             ? ` (${t[`sources.status.${source.status}`] ?? source.status})`
-            : '';
+            : source.requiresExtension
+              ? ` (${t['sources.browser']})`
+              : '';
         return {
           value: source.id,
           label: `${source.name}${suffix}`,

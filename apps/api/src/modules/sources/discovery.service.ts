@@ -131,6 +131,8 @@ export class DiscoveryService {
       remoteFriendly: true,
       config: config as RegistrySource['config'],
       requiresUserToken: false,
+      executionMode: 'server',
+      requiresExtension: false,
     };
     const adapter = resolveAdapter(entry, {});
     if (!adapter) return reject(unavailableReason(entry, {}));

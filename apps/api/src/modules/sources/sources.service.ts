@@ -33,8 +33,17 @@ const ACTIVATION_THRESHOLD = 3;
 
 export interface ResolveResult {
   usable: RegistrySource[];
+  extension: RegistrySource[];
   rejected: Array<{ source: string; reason: string }>;
 }
+
+const LEGACY_EXTENSION_BASE: Record<string, string> = {
+  linkedin_jobs: 'https://www.linkedin.com/jobs',
+  linkedin_posts: 'https://www.linkedin.com/search/results/content/',
+  indeed: 'https://www.indeed.com',
+};
+
+const EXTENSION_SEED_IDS = ['linkedin_jobs', 'linkedin_posts', 'indeed'];
 
 export const slugify = (value: string): string =>
   value
@@ -54,6 +63,7 @@ export class SourcesService implements OnModuleInit {
 
   async onModuleInit(): Promise<void> {
     await this.ensureSeeded();
+    await this.migrateLegacySources();
   }
 
   /** Seeds the curated registry on first boot; explicit runs use `seed:sources`. */
@@ -84,10 +94,45 @@ export class SourcesService implements OnModuleInit {
     return toDto(doc);
   }
 
+  async migrateLegacySources(): Promise<void> {
+    try {
+      const renames: Array<[string, string, string]> = [
+        ['linkedin', 'linkedin_jobs', 'LinkedIn Jobs'],
+        ['linkedin-posts', 'linkedin_posts', 'LinkedIn hiring posts'],
+      ];
+      for (const [from, to, name] of renames) {
+        const legacy = await this.sourceModel.findOne({ id: from }).exec();
+        if (!legacy) continue;
+        const conflict = await this.sourceModel.findOne({ id: to }).exec();
+        if (conflict) {
+          legacy.status = 'disabled';
+        } else {
+          legacy.id = to;
+          legacy.name = name;
+        }
+        await legacy.save();
+      }
+
+      const legacySources = await this.sourceModel.find({ type: 'apify' }).exec();
+      for (const doc of legacySources) {
+        const known = EXTENSION_SEED_IDS.includes(doc.id);
+        doc.type = 'html';
+        doc.config = {};
+        doc.requiresUserToken = false;
+        doc.executionMode = known ? 'extension' : 'server';
+        doc.requiresExtension = known;
+        doc.status = known ? 'active' : 'disabled';
+        await doc.save();
+      }
+    } catch (error) {
+      this.logger.warn(`Could not migrate legacy sources: ${errorMessage(error)}`);
+    }
+  }
+
   /** Active, runnable source ids — used when a run does not pick any source. */
   async defaultIds(): Promise<string[]> {
     return (await this.list({ status: 'active' }))
-      .filter(source => !source.requiresUserToken)
+      .filter(source => !source.requiresUserToken && !source.requiresExtension)
       .map(source => source.id);
   }
 
@@ -107,6 +152,7 @@ export class SourcesService implements OnModuleInit {
 
     const byId = new Map(docs.map(doc => [doc.id, doc]));
     const usable: RegistrySource[] = [];
+    const extension: RegistrySource[] = [];
     const rejected: Array<{ source: string; reason: string }> = [];
 
     for (const id of requested) {
@@ -118,6 +164,14 @@ export class SourcesService implements OnModuleInit {
       const entry = toRegistry(doc);
       if (doc.status === 'disabled') {
         rejected.push({ source: id, reason: inactiveReason(doc.status) });
+        continue;
+      }
+      if (entry.executionMode === 'extension') {
+        if (doc.status !== 'active') {
+          rejected.push({ source: id, reason: inactiveReason(doc.status) });
+          continue;
+        }
+        extension.push(entry);
         continue;
       }
       if (entry.requiresUserToken) {
@@ -135,7 +189,7 @@ export class SourcesService implements OnModuleInit {
       usable.push(entry);
     }
 
-    return { usable, rejected };
+    return { usable, extension, rejected };
   }
 
   /** Health bookkeeping called by the scraper after each source finishes. */
@@ -169,6 +223,8 @@ export class SourcesService implements OnModuleInit {
       remoteFriendly: dto.remoteFriendly,
       config: dto.config ?? {},
       requiresUserToken: false,
+      executionMode: dto.executionMode ?? 'server',
+      requiresExtension: dto.executionMode === 'extension',
       status: 'pending',
       addedBy: 'user',
       ownerId: userId,
@@ -224,6 +280,13 @@ export class SourcesService implements OnModuleInit {
 
     if (entry.requiresUserToken) {
       return this.notRunnable(doc, unavailableReason(entry, ctx));
+    }
+
+    if (entry.executionMode === 'extension') {
+      return this.notRunnable(
+        doc,
+        'Runs in your own browser through the applyForMe extension — press "Run scraper" to collect it there'
+      );
     }
 
     try {
@@ -304,24 +367,42 @@ export class SourcesService implements OnModuleInit {
   /** Legacy safety net: registry empty -> behave exactly like the old code. */
   private legacyResolve(ids: string[]): ResolveResult {
     const usable: RegistrySource[] = [];
+    const extension: RegistrySource[] = [];
     const rejected: Array<{ source: string; reason: string }> = [];
     for (const id of ids) {
       const adapter = adapterById.get(id);
-      if (!adapter) {
-        rejected.push({ source: id, reason: 'Unknown source' });
+      if (adapter) {
+        usable.push({
+          id,
+          name: adapter.name,
+          baseUrl: '',
+          type: 'api',
+          remoteFriendly: true,
+          config: { adapterId: id },
+          requiresUserToken: false,
+          executionMode: 'server',
+          requiresExtension: false,
+        });
         continue;
       }
-      usable.push({
-        id,
-        name: adapter.name,
-        baseUrl: '',
-        type: 'api',
-        remoteFriendly: true,
-        config: { adapterId: id },
-        requiresUserToken: false,
-      });
+      const baseUrl = LEGACY_EXTENSION_BASE[id];
+      if (baseUrl) {
+        extension.push({
+          id,
+          name: id,
+          baseUrl,
+          type: 'html',
+          remoteFriendly: true,
+          config: {},
+          requiresUserToken: false,
+          executionMode: 'extension',
+          requiresExtension: true,
+        });
+        continue;
+      }
+      rejected.push({ source: id, reason: 'Unknown source' });
     }
-    return { usable, rejected };
+    return { usable, extension, rejected };
   }
 
   private async uniqueId(base: string): Promise<string> {
@@ -402,6 +483,8 @@ export function toRegistry(doc: JobSourceDocument): RegistrySource {
     remoteFriendly: Boolean(doc.remoteFriendly),
     config: (doc.config ?? {}) as RegistrySource['config'],
     requiresUserToken: Boolean(doc.requiresUserToken),
+    executionMode: doc.executionMode ?? 'server',
+    requiresExtension: Boolean(doc.requiresExtension),
   };
 }
 
@@ -445,6 +528,8 @@ function toDoc(seed: SeedSource): Record<string, unknown> {
     status: seed.status,
     config: seed.config ?? {},
     requiresUserToken: Boolean(seed.requiresUserToken),
+    executionMode: seed.executionMode ?? 'server',
+    requiresExtension: Boolean(seed.requiresExtension),
     health: emptyHealth(),
     addedBy: seed.addedBy ?? 'system',
     ownerId: null,

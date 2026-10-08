@@ -1,7 +1,40 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import type { Document } from 'mongoose';
+import type { ExtensionTaskStatus } from '@agency-apply/shared';
 
 export type ScrapeRunDocument = ScrapeRun & Document;
+
+@Schema({ _id: false })
+export class ExtensionTaskRecord {
+  @Prop({ required: true })
+  id: string;
+
+  @Prop({ required: true })
+  source: string;
+
+  @Prop({ required: true, default: 'pending', type: String })
+  status: ExtensionTaskStatus;
+
+  @Prop({ default: '' })
+  searchUrl: string;
+
+  @Prop({ default: 0, min: 0 })
+  pagesCaptured: number;
+
+  @Prop({ default: 0, min: 0 })
+  itemsFound: number;
+
+  @Prop({ default: '' })
+  message: string;
+
+  @Prop({ type: Date, default: null })
+  startedAt: Date | null;
+
+  @Prop({ type: Date, default: null })
+  finishedAt: Date | null;
+}
+
+export const ExtensionTaskRecordSchema = SchemaFactory.createForClass(ExtensionTaskRecord);
 
 @Schema({ timestamps: true, collection: 'scrape_runs' })
 export class ScrapeRun {
@@ -34,6 +67,9 @@ export class ScrapeRun {
     default: [],
   })
   errors: Array<{ source: string; message: string }>;
+
+  @Prop({ type: [ExtensionTaskRecordSchema], default: [] })
+  extensionTasks: ExtensionTaskRecord[];
 
   @Prop({ type: Date, default: null })
   startedAt: Date | null;

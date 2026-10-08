@@ -242,7 +242,8 @@ export const frTranslations: Record<string, string> = {
     'Les offres sont récupérées en direct depuis des API et job boards publics. Certains sites (TanitJobs) bloquent l’automatisation et restent indisponibles.',
 
   // Sources
-  'source.linkedin': 'LinkedIn',
+  'source.linkedinJobs': 'Emplois LinkedIn',
+  'source.linkedinPosts': 'Offres LinkedIn',
   'source.indeed': 'Indeed',
   'source.tanitjobs': 'TanitJobs',
   'source.emploiNat': 'Emploi.nat.tn',
@@ -274,6 +275,7 @@ export const frTranslations: Record<string, string> = {
   'sources.type.html': 'HTML',
   'sources.type.ai_extract': 'Extraction IA',
   'sources.needsKey': 'Connectez une clé fournisseur pour activer',
+  'sources.browser': 'dans votre navigateur',
   'sources.remoteFriendly': 'Compatible télétravail',
   'sources.filter.country': 'Filtrer par pays',
   'sources.filter.status': 'Filtrer par statut',

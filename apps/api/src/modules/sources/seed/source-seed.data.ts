@@ -1,4 +1,10 @@
-import type { SourceAddedBy, SourceConfig, SourceStatus, SourceType } from '@agency-apply/shared';
+import type {
+  SourceAddedBy,
+  SourceConfig,
+  SourceExecutionMode,
+  SourceStatus,
+  SourceType,
+} from '@agency-apply/shared';
 
 export type SeedSource = {
   id: string;
@@ -12,10 +18,14 @@ export type SeedSource = {
   status: SourceStatus;
   config: SourceConfig;
   requiresUserToken: boolean;
+  executionMode?: SourceExecutionMode;
+  requiresExtension?: boolean;
   addedBy: SourceAddedBy;
 };
 
 const system = (source: Omit<SeedSource, 'addedBy'>): SeedSource => ({
+  executionMode: 'server',
+  requiresExtension: false,
   ...source,
   addedBy: 'system',
 });
@@ -97,6 +107,53 @@ export const SOURCE_SEED: SeedSource[] = [
       ],
     },
     requiresUserToken: false,
+  }),
+
+  // ---- Extension sources (collected in the user's own browser) ----------
+  system({
+    id: 'linkedin_jobs',
+    name: 'LinkedIn Jobs',
+    description: 'Collected from your own browser session, on your click, a few pages at a time.',
+    baseUrl: 'https://www.linkedin.com/jobs',
+    type: 'html',
+    countries: ['*'],
+    categories: ['general', 'tech'],
+    remoteFriendly: true,
+    status: 'active',
+    config: {},
+    requiresUserToken: false,
+    executionMode: 'extension',
+    requiresExtension: true,
+  }),
+  system({
+    id: 'linkedin_posts',
+    name: 'LinkedIn hiring posts',
+    description: 'Hiring posts and announcements read from your own LinkedIn feed.',
+    baseUrl: 'https://www.linkedin.com/search/results/content/',
+    type: 'html',
+    countries: ['*'],
+    categories: ['general'],
+    remoteFriendly: true,
+    status: 'active',
+    config: {},
+    requiresUserToken: false,
+    executionMode: 'extension',
+    requiresExtension: true,
+  }),
+  system({
+    id: 'indeed',
+    name: 'Indeed',
+    description: 'Collected from your own browser session, on your click, a few pages at a time.',
+    baseUrl: 'https://www.indeed.com',
+    type: 'html',
+    countries: ['*'],
+    categories: ['general'],
+    remoteFriendly: true,
+    status: 'active',
+    config: {},
+    requiresUserToken: false,
+    executionMode: 'extension',
+    requiresExtension: true,
   }),
 
   // ---- FR ---------------------------------------------------------------

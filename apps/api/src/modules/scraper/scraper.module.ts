@@ -3,6 +3,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Job, JobSchema } from '../jobs/job.schema';
 import { JobsModule } from '../jobs/jobs.module';
 import { SourcesModule } from '../sources/sources.module';
+import { ExtensionModule } from '../extension/extension.module';
+import { ExtensionRunController } from './extension-run.controller';
+import { IngestController } from './ingest.controller';
 import { ScrapeRun, ScrapeRunSchema } from './run.schema';
 import { ScraperController } from './scraper.controller';
 import { ScraperService } from './scraper.service';
@@ -15,8 +18,9 @@ import { ScraperService } from './scraper.service';
     ]),
     JobsModule,
     SourcesModule,
+    ExtensionModule,
   ],
-  controllers: [ScraperController],
+  controllers: [ScraperController, ExtensionRunController, IngestController],
   providers: [ScraperService],
 })
 export class ScraperModule {}
