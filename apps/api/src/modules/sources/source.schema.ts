@@ -1,6 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import type { Document } from 'mongoose';
-import type { SourceAddedBy, SourceStatus, SourceType } from '@agency-apply/shared';
+import type {
+  SourceAddedBy,
+  SourceExecutionMode,
+  SourceStatus,
+  SourceType,
+} from '@agency-apply/shared';
 
 export type JobSourceDocument = JobSource & Document;
 
@@ -56,6 +61,14 @@ export class JobSource {
 
   @Prop({ default: false })
   requiresUserToken: boolean;
+
+  /** Where the source runs: on our servers, or in the user's own browser. */
+  @Prop({ required: true, default: 'server', index: true, type: String })
+  executionMode: SourceExecutionMode;
+
+  /** True when the source can only be collected through the browser extension. */
+  @Prop({ default: false, index: true })
+  requiresExtension: boolean;
 
   @Prop({
     type: {

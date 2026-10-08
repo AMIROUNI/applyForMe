@@ -1,8 +1,10 @@
 import { z } from 'zod';
 
-export const sourceTypeSchema = z.enum(['api', 'rss', 'html', 'apify', 'ai_extract']);
+export const sourceTypeSchema = z.enum(['api', 'rss', 'html', 'ai_extract']);
 export const sourceStatusSchema = z.enum(['active', 'pending', 'disabled', 'broken']);
 export const sourceAddedBySchema = z.enum(['system', 'ai', 'user']);
+/** `server`: scraped by the API. `extension`: collected in the user's browser. */
+export const sourceExecutionModeSchema = z.enum(['server', 'extension']);
 
 /** ISO-3166 alpha-2 code, or `*` for a globally relevant source. */
 export const sourceCountrySchema = z
@@ -21,8 +23,6 @@ export const sourceConfigSchema = z
     selectors: z.record(z.string().max(300)).optional(),
     fieldMap: z.record(z.string().max(300)).optional(),
     query: z.record(z.string().max(300)).optional(),
-    apifyActorId: z.string().max(200).optional(),
-    inputTemplate: z.record(z.unknown()).optional(),
   })
   .passthrough();
 
@@ -45,6 +45,8 @@ export const jobSourceSchema = z.object({
   status: sourceStatusSchema,
   config: sourceConfigSchema,
   requiresUserToken: z.boolean(),
+  executionMode: sourceExecutionModeSchema.default('server'),
+  requiresExtension: z.boolean().default(false),
   health: sourceHealthSchema,
   addedBy: sourceAddedBySchema,
   /** Set only for sources created by a user; system/ai sources are shared. */
@@ -75,6 +77,7 @@ export const createSourceSchema = z.object({
   countries: z.array(sourceCountrySchema).max(30).default([]),
   categories: z.array(z.string().trim().min(1).max(40)).max(10).default([]),
   remoteFriendly: z.boolean().default(true),
+  executionMode: sourceExecutionModeSchema.default('server'),
   config: sourceConfigSchema.default({}),
 });
 
@@ -106,6 +109,7 @@ export const sourceValidateResultSchema = z.object({
 export type SourceType = z.infer<typeof sourceTypeSchema>;
 export type SourceStatus = z.infer<typeof sourceStatusSchema>;
 export type SourceAddedBy = z.infer<typeof sourceAddedBySchema>;
+export type SourceExecutionMode = z.infer<typeof sourceExecutionModeSchema>;
 export type SourceConfig = z.infer<typeof sourceConfigSchema>;
 export type SourceHealth = z.infer<typeof sourceHealthSchema>;
 export type JobSource = z.infer<typeof jobSourceSchema>;

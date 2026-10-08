@@ -24,7 +24,6 @@ import {
   type AdapterContext,
   type RegistrySource,
 } from '../scraper/adapters';
-import { ProviderKeysService } from '../provider-keys/provider-keys.service';
 import { SOURCE_SEED, type SeedSource } from './seed/source-seed.data';
 import { JobSource, emptyHealth, type JobSourceDocument } from './source.schema';
 import { assertSafeHttpUrl, assertSafeSourceConfig } from './url-guard';
@@ -50,8 +49,7 @@ export class SourcesService implements OnModuleInit {
   private readonly logger = new Logger(SourcesService.name);
 
   constructor(
-    @InjectModel(JobSource.name) private readonly sourceModel: Model<JobSourceDocument>,
-    private readonly providerKeys: ProviderKeysService
+    @InjectModel(JobSource.name) private readonly sourceModel: Model<JobSourceDocument>
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -122,8 +120,7 @@ export class SourcesService implements OnModuleInit {
         rejected.push({ source: id, reason: inactiveReason(doc.status) });
         continue;
       }
-      const tokenOk = entry.type === 'apify' ? Boolean(ctx.apifyToken) : false;
-      if (entry.requiresUserToken && !tokenOk) {
+      if (entry.requiresUserToken) {
         rejected.push({ source: id, reason: unavailableReason(entry, ctx) });
         continue;
       }
@@ -213,21 +210,19 @@ export class SourcesService implements OnModuleInit {
   /**
    * Dry run: fetch a sample through the source's adapter (or probe reachability
    * when no adapter exists yet), record health and preview up to 3 jobs.
-   * Apify sources need the user's connected token; without it we refuse
-   * instead of probing a site we are not allowed to scrape directly.
+   * Sources that cannot be probed from our servers refuse instead of touching
+   * a site we are not allowed to fetch.
    */
   async validate(userId: string, id: string): Promise<SourceValidateResult> {
     const doc = await this.sourceModel.findOne({ id }).exec();
     if (!doc) throw this.notFound(id);
 
     const entry = toRegistry(doc);
-    const apifyToken =
-      entry.type === 'apify' ? await this.providerKeys.getDecrypted(userId, 'apify') : null;
-    const ctx: AdapterContext = { apifyToken };
+    const ctx: AdapterContext = {};
     const adapter = resolveAdapter(entry, ctx);
     const startedAt = Date.now();
 
-    if (entry.requiresUserToken && !ctx.apifyToken) {
+    if (entry.requiresUserToken) {
       return this.notRunnable(doc, unavailableReason(entry, ctx));
     }
 
@@ -236,7 +231,7 @@ export class SourcesService implements OnModuleInit {
       assertSafeSourceConfig(doc.config as Record<string, unknown> | null);
 
       if (!adapter) {
-        if (entry.type === 'apify' || entry.type === 'ai_extract') {
+        if (entry.type === 'ai_extract') {
           return this.notRunnable(doc, unavailableReason(entry, ctx));
         }
         await canFetch(doc.baseUrl);
@@ -423,6 +418,8 @@ export function toDto(doc: JobSourceDocument): JobSourceDto {
     status: doc.status,
     config: (doc.config ?? {}) as JobSourceDto['config'],
     requiresUserToken: Boolean(doc.requiresUserToken),
+    executionMode: doc.executionMode ?? 'server',
+    requiresExtension: Boolean(doc.requiresExtension),
     health: {
       lastSuccessAt: doc.health?.lastSuccessAt ?? null,
       lastErrorAt: doc.health?.lastErrorAt ?? null,

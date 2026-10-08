@@ -249,9 +249,7 @@ describe('resolveAdapter wiring', () => {
     expect(unavailableReason(bare)).toContain('endpoint');
   });
 
-  it('keeps apify and ai_extract waiting for their phases', () => {
-    expect(resolveAdapter(source({ type: 'apify' }))).toBeNull();
-    expect(unavailableReason(source({ type: 'apify' }))).toContain('Apify');
+  it('keeps ai_extract waiting for its phase', () => {
     expect(resolveAdapter(source({ type: 'ai_extract' }))).toBeNull();
     expect(unavailableReason(source({ type: 'ai_extract' }))).toContain('AI extraction');
   });

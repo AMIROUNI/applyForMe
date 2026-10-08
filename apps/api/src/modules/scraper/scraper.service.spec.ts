@@ -40,7 +40,6 @@ describe('ScraperService', () => {
   };
   let jobModel: { bulkWrite: jest.Mock };
   let sourcesService: { resolve: jest.Mock; recordOutcome: jest.Mock };
-  let providerKeys: { getDecrypted: jest.Mock };
   let runDoc: Record<string, unknown> & { save: jest.Mock };
   const originalAdapters = new Map(
     DEFAULT_SOURCES.map(id => [id, adapterById.get(id) as SourceAdapter])
@@ -75,13 +74,7 @@ describe('ScraperService', () => {
       resolve: jest.fn().mockImplementation((ids: string[]) => resolveSources(ids)),
       recordOutcome: jest.fn().mockResolvedValue(undefined),
     };
-    providerKeys = { getDecrypted: jest.fn().mockResolvedValue(null) };
-    service = new ScraperService(
-      runModel as never,
-      jobModel as never,
-      sourcesService as never,
-      providerKeys as never
-    );
+    service = new ScraperService(runModel as never, jobModel as never, sourcesService as never);
   });
 
   afterEach(() => {

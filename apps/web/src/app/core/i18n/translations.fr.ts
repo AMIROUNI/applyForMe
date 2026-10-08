@@ -239,7 +239,7 @@ export const frTranslations: Record<string, string> = {
   'scraper.noSources': 'Aucune source ne couvre encore ce pays.',
   'scraper.manageSources': 'Gérer les sources',
   'scraper.hint':
-    'Les offres sont récupérées en direct depuis des API et job boards publics. Certains sites (LinkedIn, Indeed, TanitJobs) bloquent l’automatisation et restent indisponibles.',
+    'Les offres sont récupérées en direct depuis des API et job boards publics. Certains sites (TanitJobs) bloquent l’automatisation et restent indisponibles.',
 
   // Sources
   'source.linkedin': 'LinkedIn',
@@ -272,22 +272,8 @@ export const frTranslations: Record<string, string> = {
   'sources.type.api': 'API',
   'sources.type.rss': 'RSS',
   'sources.type.html': 'HTML',
-  'sources.type.apify': 'Apify',
   'sources.type.ai_extract': 'Extraction IA',
-  'sources.needsKey': 'Connectez Apify pour activer',
-  'sources.apify.title': 'Intégration Apify',
-  'sources.apify.desc':
-    "LinkedIn, Indeed et Glassdoor passent par votre propre compte Apify. Le jeton est chiffré au repos, vérifié à l'enregistrement, et jamais réaffiché.",
-  'sources.apify.token': 'Jeton API',
-  'sources.apify.tokenPlaceholder': 'apify_api_...',
-  'sources.apify.connect': 'Connecter',
-  'sources.apify.connected': 'Apify connecté',
-  'sources.apify.connectedNotice':
-    'Compte Apify connecté - les sources Apify peuvent maintenant être validées et exécutées.',
-  'sources.apify.disconnect': 'Déconnecter',
-  'sources.apify.tokenMasked': 'Jeton se terminant par {lastFour}',
-  'sources.apify.verified': 'Vérifié',
-  'sources.apify.failed': 'Apify a refusé ce jeton. Vérifiez-le et réessayez.',
+  'sources.needsKey': 'Connectez une clé fournisseur pour activer',
   'sources.remoteFriendly': 'Compatible télétravail',
   'sources.filter.country': 'Filtrer par pays',
   'sources.filter.status': 'Filtrer par statut',

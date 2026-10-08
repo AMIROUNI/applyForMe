@@ -35,10 +35,7 @@ export interface SourceAdapter {
 }
 
 /** Per-run secrets handed to adapter factories; never persisted on a source. */
-export interface AdapterContext {
-  /** Decrypted user Apify token, when one is connected for this user. */
-  apifyToken?: string | null;
-}
+export type AdapterContext = Record<string, unknown>;
 
 /** A source as stored in the `job_sources` registry, reduced to what a resolver/adapter needs. */
 export interface RegistrySource {

@@ -10,7 +10,6 @@ import { AuthModule } from './modules/auth/auth.module';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { ScraperModule } from './modules/scraper/scraper.module';
 import { SourcesModule } from './modules/sources/sources.module';
-import { ProviderKeysModule } from './modules/provider-keys/provider-keys.module';
 import { HealthController } from './health.controller';
 import envConfig, { findEnvFile } from './config/env';
 
@@ -40,7 +39,6 @@ import envConfig, { findEnvFile } from './config/env';
     JobsModule,
     ScraperModule,
     SourcesModule,
-    ProviderKeysModule,
   ],
   controllers: [HealthController],
   providers: [

@@ -24,11 +24,9 @@ const system = (source: Omit<SeedSource, 'addedBy'>): SeedSource => ({
  * Starter registry. `active` entries have a working adapter today; the rest
  * activate through `POST /sources/:id/validate` as soon as their adapter
  * returns enough jobs - generic html/rss/api adapters (Phase 2) cover most of
- * them, the Apify connector (Phase 3) runs the `apify` types once the user
- * connects their token, and AI discovery (Phase 4) adds country-specific
- * `pending` sources through `POST /sources/discover` (`ai_extract` itself
- * stays unsupported by design - the model only proposes, deterministic
- * adapters scrape).
+ * them, and AI discovery (Phase 4) adds country-specific `pending` sources
+ * through `POST /sources/discover` (`ai_extract` itself stays unsupported by
+ * design - the model only proposes, deterministic adapters scrape).
  */
 export const SOURCE_SEED: SeedSource[] = [
   // ---- Active: existing bespoke adapters --------------------------------
@@ -99,61 +97,6 @@ export const SOURCE_SEED: SeedSource[] = [
       ],
     },
     requiresUserToken: false,
-  }),
-
-  // ---- Apify-only sources (anti-bot / no public API) --------------------
-  system({
-    id: 'linkedin',
-    name: 'LinkedIn Jobs',
-    description: 'Fetched through your own Apify account — LinkedIn forbids direct scraping.',
-    baseUrl: 'https://www.linkedin.com/jobs',
-    type: 'apify',
-    countries: ['*'],
-    categories: ['general', 'tech'],
-    remoteFriendly: true,
-    status: 'pending',
-    // Actor id is configurable and must be verified when the connector ships.
-    config: { apifyActorId: 'apify/linkedin-jobs-scraper' },
-    requiresUserToken: true,
-  }),
-  system({
-    id: 'linkedin-posts',
-    name: 'LinkedIn hiring posts',
-    description: 'Hiring posts and announcements, stored as posts instead of jobs.',
-    baseUrl: 'https://www.linkedin.com/feed',
-    type: 'apify',
-    countries: ['*'],
-    categories: ['general'],
-    remoteFriendly: true,
-    status: 'pending',
-    config: { apifyActorId: 'apify/linkedin-posts-scraper' },
-    requiresUserToken: true,
-  }),
-  system({
-    id: 'indeed',
-    name: 'Indeed',
-    description: 'Fetched through your own Apify account — Indeed forbids direct scraping.',
-    baseUrl: 'https://www.indeed.com',
-    type: 'apify',
-    countries: ['*'],
-    categories: ['general'],
-    remoteFriendly: true,
-    status: 'pending',
-    config: { apifyActorId: 'apify/indeed-scraper' },
-    requiresUserToken: true,
-  }),
-  system({
-    id: 'glassdoor',
-    name: 'Glassdoor',
-    description: 'Reviews and listings through your own Apify account.',
-    baseUrl: 'https://www.glassdoor.com',
-    type: 'apify',
-    countries: ['*'],
-    categories: ['general'],
-    remoteFriendly: false,
-    status: 'pending',
-    config: { apifyActorId: 'apify/glassdoor-scraper' },
-    requiresUserToken: true,
   }),
 
   // ---- FR ---------------------------------------------------------------
